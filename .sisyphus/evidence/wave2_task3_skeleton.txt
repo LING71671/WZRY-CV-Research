@@ -1,0 +1,3 @@
+Created canonical skeleton paths for wave 2 task 3.
+Packages: src/wzry_ai, app, battle, compat, compat/legacy, config, detection, device, game_manager, movement, skills, utils.
+Support dirs: scripts, assets/templates, assets/templates/hero_skills, assets/heroes, docs.

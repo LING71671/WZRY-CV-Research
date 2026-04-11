@@ -1,0 +1,22 @@
+{
+  "check": "resolver-smoke",
+  "status": "pass",
+  "generated_at": "2026-04-11T01:44:34.290850+00:00",
+  "repo_root": "E:\\wzry_ai_v1.0_20260409",
+  "canonical_code_root": "src/wzry_ai",
+  "resolver_candidates": [
+    "src/wzry_ai/utils/resource_resolver.py"
+  ],
+  "results": [
+    {
+      "module": "wzry_ai.utils.resource_resolver",
+      "authority": "future",
+      "path": "src/wzry_ai/utils/resource_resolver.py",
+      "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
+      "returncode": 0,
+      "status": "pass",
+      "import_ok": true,
+      "candidate_path": "src/wzry_ai/utils/resource_resolver.py"
+    }
+  ]
+}

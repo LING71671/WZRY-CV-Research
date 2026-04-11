@@ -1,0 +1,92 @@
+{
+  "check": "duplicate-authority",
+  "status": "fail",
+  "generated_at": "2026-04-11T01:38:17.195713+00:00",
+  "repo_root": "E:\\wzry_ai_v1.0_20260409",
+  "canonical_code_root": "src/wzry_ai",
+  "canonical_code_root_exists": true,
+  "duplicate_packages": [
+    "config",
+    "device",
+    "utils",
+    "detection",
+    "game_manager",
+    "skills",
+    "battle",
+    "movement"
+  ],
+  "results": [
+    {
+      "package": "config",
+      "root_path": "config",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/config",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "device",
+      "root_path": "device",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/device",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "utils",
+      "root_path": "utils",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/utils",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "detection",
+      "root_path": "detection",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/detection",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "game_manager",
+      "root_path": "game_manager",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/game_manager",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "skills",
+      "root_path": "skills",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/skills",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "battle",
+      "root_path": "battle",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/battle",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    },
+    {
+      "package": "movement",
+      "root_path": "movement",
+      "root_exists": true,
+      "canonical_path": "src/wzry_ai/movement",
+      "canonical_exists": true,
+      "status": "fail",
+      "duplicate_authority": true
+    }
+  ]
+}

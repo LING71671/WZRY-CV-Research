@@ -1,0 +1,17 @@
+{
+  "port": 16384,
+  "serial": "127.0.0.1:16384",
+  "window_title": "王者模拟器",
+  "window_rect": [
+    1,
+    0,
+    1929,
+    1124
+  ],
+  "client_size": [
+    1912,
+    1076
+  ],
+  "saved_at": "2026-04-11 00:45:30",
+  "adb_path": "C:\\Program Files (x86)\\Android\\android-sdk\\platform-tools\\adb.exe"
+}

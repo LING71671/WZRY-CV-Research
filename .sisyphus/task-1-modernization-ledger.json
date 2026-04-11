@@ -1,0 +1,153 @@
+{
+  "task": 1,
+  "slug": "architecture-map",
+  "repo_root": "E:\\wzry_ai_v1.0_20260409",
+  "canonical_code_root": "src/wzry_ai",
+  "canonical_entrypoint": "scripts/master_auto.py",
+  "default_root_shims": [
+    "Master_Auto.py"
+  ],
+  "canonical_boundaries": {
+    "packages": [
+      "src/wzry_ai/app",
+      "src/wzry_ai/config",
+      "src/wzry_ai/game_manager",
+      "src/wzry_ai/battle",
+      "src/wzry_ai/movement",
+      "src/wzry_ai/detection",
+      "src/wzry_ai/device",
+      "src/wzry_ai/skills",
+      "src/wzry_ai/utils",
+      "src/wzry_ai/compat/legacy"
+    ],
+    "support": [
+      "scripts",
+      "assets/templates",
+      "assets/templates/hero_skills",
+      "assets/heroes",
+      "models",
+      "data",
+      "docs"
+    ]
+  },
+  "repo_assumptions": {
+    "hero_skills_target": "assets/templates/hero_skills",
+    "config_public_surface": "src/wzry_ai/config/__init__.py",
+    "master_auto_role": "root shim after cutover"
+  },
+  "mapping": [
+    {
+      "source": "Master_Auto.py",
+      "target": "Master_Auto.py -> shim; scripts/master_auto.py -> operator entrypoint; src/wzry_ai/app -> composition root",
+      "kind": "entrypoint"
+    },
+    {
+      "source": "config",
+      "target": "src/wzry_ai/config",
+      "kind": "package"
+    },
+    {
+      "source": "device",
+      "target": "src/wzry_ai/device",
+      "kind": "package"
+    },
+    {
+      "source": "utils",
+      "target": "src/wzry_ai/utils",
+      "kind": "package"
+    },
+    {
+      "source": "detection",
+      "target": "src/wzry_ai/detection",
+      "kind": "package"
+    },
+    {
+      "source": "game_manager",
+      "target": "src/wzry_ai/game_manager",
+      "kind": "package"
+    },
+    {
+      "source": "skills",
+      "target": "src/wzry_ai/skills",
+      "kind": "package"
+    },
+    {
+      "source": "battle",
+      "target": "src/wzry_ai/battle",
+      "kind": "package"
+    },
+    {
+      "source": "movement",
+      "target": "src/wzry_ai/movement",
+      "kind": "package"
+    },
+    {
+      "source": "image",
+      "target": "assets/templates",
+      "kind": "resource"
+    },
+    {
+      "source": "hero_skills",
+      "target": "assets/templates/hero_skills",
+      "kind": "resource"
+    },
+    {
+      "source": "hero",
+      "target": "assets/heroes",
+      "kind": "resource"
+    },
+    {
+      "source": "models",
+      "target": "models",
+      "kind": "resource_boundary"
+    },
+    {
+      "source": "data",
+      "target": "data",
+      "kind": "resource_boundary"
+    },
+    {
+      "source": "AGENTS.md",
+      "target": "docs/project-knowledge/AGENTS.md",
+      "kind": "documentation"
+    },
+    {
+      "source": "使用文档.txt",
+      "target": "docs/operator/使用文档.txt",
+      "kind": "documentation"
+    }
+  ],
+  "migration_order": [
+    [
+      "config",
+      "device",
+      "utils"
+    ],
+    [
+      "detection",
+      "game_manager"
+    ],
+    [
+      "skills",
+      "battle",
+      "movement"
+    ],
+    [
+      "app",
+      "scripts/master_auto.py",
+      "Master_Auto.py shim reduction"
+    ]
+  ],
+  "cutover_rules": [
+    "Only wzry_ai.* absolute imports remain active after cutover.",
+    "All resource access is routed through one resolver in wzry_ai.app or wzry_ai.utils.",
+    "Root directories are non-canonical immediately after their packaged equivalents are active.",
+    "compat/legacy only hosts explicitly approved deprecated code.",
+    "No extra long-lived root shims are introduced beyond Master_Auto.py."
+  ],
+  "legacy_rules": [
+    "skills/hero_skill_manager.py relocates to src/wzry_ai/compat/legacy during skill-package migration.",
+    "skills/__init__.py export compatibility is preserved inside the package namespace while the legacy manager is retired.",
+    "battle/hero_registry.py dynamic import strings are updated during the skills+battle wave."
+  ]
+}

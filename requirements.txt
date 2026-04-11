@@ -1,0 +1,51 @@
+# 王者荣耀AI项目依赖
+# 安装命令: pip install -r requirements.txt
+
+# ========== 核心依赖 ==========
+# OpenCV - 图像处理和显示
+opencv-python>=4.8.0
+
+# NumPy - 数值计算和数组操作
+numpy<2
+
+# Pillow - 图像处理（用于中文文字绘制）
+Pillow
+
+# ========== YOLO检测 ==========
+# Ultralytics - YOLOv8目标检测框架
+ultralytics
+
+# PyTorch - 深度学习框架（ultralytics的依赖，但直接import使用）
+torch
+
+# ========== 设备连接与控制 ==========
+# scrcpy-client - 安卓屏幕镜像和视频流
+scrcpy-client
+
+# adbutils - ADB设备管理
+adbutils
+
+# av - PyAV视频处理（scrcpy依赖）
+av
+
+# pywin32 - Windows API访问（win32gui, win32con等）
+pywin32
+
+# ========== OCR文字识别 ==========
+# PaddleOCR - 中文OCR识别（主用）
+paddleocr>=3.0.0
+
+# EasyOCR - OCR备选方案
+easyocr
+
+# ========== 模板匹配 ==========
+# MTM - 多模板匹配库
+MTM
+
+# ========== 窗口管理 ==========
+# pygetwindow - 窗口管理
+pygetwindow
+
+# ========== 进程管理 ==========
+# psutil - 系统进程和系统利用率信息（用于模拟器窗口查找）
+psutil

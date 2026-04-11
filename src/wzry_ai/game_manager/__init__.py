@@ -1,0 +1,1 @@
+"""Game manager package skeleton."""

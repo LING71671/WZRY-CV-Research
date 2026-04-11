@@ -1,0 +1,2 @@
+Verified importable package dirs were given minimal __init__.py files.
+No additional init files were added to non-package support directories.
