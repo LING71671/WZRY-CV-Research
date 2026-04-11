@@ -13,7 +13,7 @@ for candidate in (SRC_ROOT, REPO_ROOT):
     if candidate_str not in sys.path:
         sys.path.insert(0, candidate_str)
 
-from config import ADB_DEVICE_SERIAL
+from wzry_ai.config import ADB_DEVICE_SERIAL
 from wzry_ai.app.main import main as _packaged_main
 
 

@@ -1,11 +1,26 @@
 {
-  "generated_at": "2026-04-11T01:50:55.442337+00:00",
-  "overall_status": "pass",
+  "generated_at": "2026-04-11T03:13:33.692872+00:00",
+  "overall_status": "fail",
   "checks": [
+    {
+      "check": "import-smoke",
+      "status": "fail",
+      "evidence_path": ".sisyphus/evidence/task-2-import-smoke.json"
+    },
     {
       "check": "entrypoint-smoke",
       "status": "pass",
       "evidence_path": ".sisyphus/evidence/task-2-entrypoint-smoke.json"
+    },
+    {
+      "check": "duplicate-authority",
+      "status": "pass",
+      "evidence_path": ".sisyphus/evidence/task-2-duplicate-authority.json"
+    },
+    {
+      "check": "resolver-smoke",
+      "status": "pass",
+      "evidence_path": ".sisyphus/evidence/task-2-resolver-smoke.json"
     }
   ],
   "notes": [

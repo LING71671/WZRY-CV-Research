@@ -1,14 +1,14 @@
 {
   "check": "entrypoint-smoke",
   "status": "pass",
-  "generated_at": "2026-04-11T01:50:55.441633+00:00",
+  "generated_at": "2026-04-11T03:13:33.531352+00:00",
   "repo_root": "E:\\wzry_ai_v1.0_20260409",
   "results": [
     {
       "authority": "root",
       "path": "Master_Auto.py",
       "exists": true,
-      "file_size_bytes": 577,
+      "file_size_bytes": 610,
       "compile_ok": true,
       "ast_ok": true,
       "functions": [
@@ -22,7 +22,7 @@
       "authority": "future",
       "path": "scripts/master_auto.py",
       "exists": true,
-      "file_size_bytes": 581,
+      "file_size_bytes": 614,
       "compile_ok": true,
       "ast_ok": true,
       "functions": [

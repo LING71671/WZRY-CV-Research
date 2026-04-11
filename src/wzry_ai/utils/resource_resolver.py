@@ -1,6 +1,7 @@
 """运行时资源路径解析器。
 
 集中管理仓库根目录发现、规范路径构建，以及从规范目录回退到当前过渡目录的查找逻辑。
+未来迁移到 ``wzry_ai.utils`` 时，只需移动本模块即可，调用方 API 保持不变。
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ class RuntimePathResolver:
 
     @classmethod
     def discover_repo_root(cls, start: PathLike) -> Path:
+        """从给定锚点向上发现仓库根目录。"""
         current = Path(start).resolve()
         if current.is_file():
             current = current.parent
@@ -64,6 +66,7 @@ class RuntimePathResolver:
         return self.repo_root / "src" / "wzry_ai"
 
     def build_canonical_path(self, boundary: str, *parts: PathLike) -> Path:
+        """构建冻结后的规范路径，不做过渡回退。"""
         roots = {
             "templates": self.repo_root / "assets" / "templates",
             "hero_skills": self.repo_root / "assets" / "templates" / "hero_skills",
@@ -150,7 +153,9 @@ class RuntimePathResolver:
         if canonical.exists():
             return canonical
 
-        for fallback_parts in self._DOC_FALLBACKS.get(normalized_parts, ()):
+        for fallback_parts in self._DOC_FALLBACKS.get(
+            normalized_parts, ()
+        ):  # 仅在解析器内部允许过渡回退
             candidate = self._join(self.repo_root, *fallback_parts)
             if candidate.exists():
                 return candidate

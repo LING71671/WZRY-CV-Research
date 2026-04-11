@@ -1,7 +1,7 @@
 {
   "check": "import-smoke",
-  "status": "pass",
-  "generated_at": "2026-04-11T01:38:17.135870+00:00",
+  "status": "fail",
+  "generated_at": "2026-04-11T03:13:33.522728+00:00",
   "repo_root": "E:\\wzry_ai_v1.0_20260409",
   "ledger": ".sisyphus/task-1-modernization-ledger.json",
   "results": [
@@ -9,74 +9,65 @@
       "module": "config",
       "authority": "root",
       "path": "config",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "device",
       "authority": "root",
       "path": "device",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "utils",
       "authority": "root",
       "path": "utils",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "detection",
       "authority": "root",
       "path": "detection",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "game_manager",
       "authority": "root",
       "path": "game_manager",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true,
-      "stderr": "MTM 库未安装，将使用传统单模板匹配"
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "skills",
       "authority": "root",
       "path": "skills",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "battle",
       "authority": "root",
       "path": "battle",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "movement",
       "authority": "root",
       "path": "movement",
-      "pythonpath": null,
-      "returncode": 0,
-      "status": "pass",
-      "import_ok": true
+      "status": "missing_current_module_path",
+      "import_ok": false,
+      "detail": "module path does not exist"
     },
     {
       "module": "wzry_ai",
@@ -112,7 +103,8 @@
       "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
       "returncode": 0,
       "status": "pass",
-      "import_ok": true
+      "import_ok": true,
+      "stderr": "MTM 库未安装，将使用传统单模板匹配"
     },
     {
       "module": "wzry_ai.battle",
@@ -130,7 +122,8 @@
       "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
       "returncode": 0,
       "status": "pass",
-      "import_ok": true
+      "import_ok": true,
+      "stderr": "emulator_manager 未找到，将使用传统端口扫描"
     },
     {
       "module": "wzry_ai.detection",
@@ -139,7 +132,8 @@
       "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
       "returncode": 0,
       "status": "pass",
-      "import_ok": true
+      "import_ok": true,
+      "stderr": "emulator_manager 未找到，将使用传统端口扫描"
     },
     {
       "module": "wzry_ai.device",
@@ -148,7 +142,8 @@
       "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
       "returncode": 0,
       "status": "pass",
-      "import_ok": true
+      "import_ok": true,
+      "stderr": "emulator_manager 未找到，将使用传统端口扫描"
     },
     {
       "module": "wzry_ai.skills",
@@ -157,7 +152,8 @@
       "pythonpath": "E:\\wzry_ai_v1.0_20260409\\src",
       "returncode": 0,
       "status": "pass",
-      "import_ok": true
+      "import_ok": true,
+      "stderr": "emulator_manager 未找到，将使用传统端口扫描"
     },
     {
       "module": "wzry_ai.utils",
@@ -181,7 +177,7 @@
   "summary": {
     "root_modules": 8,
     "future_modules": 11,
-    "root_failures": 0,
+    "root_failures": 8,
     "future_pending": 0
   }
 }

@@ -1,0 +1,50 @@
+# Python 缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# sisyphus 工作目录
+.sisyphus/
+
+# 虚拟环境
+venv/
+env/
+ENV/
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+logs/
+
+# 运行时数据
+data/mumu_config.json
+
+# 模型文件（太大，不适合提交）
+models/*.pt
+models/*.engine
+models/*.onnx
+
+# 临时文件
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Ruff 缓存
+.ruff_cache/
+
+# 测试覆盖率
+.coverage
+htmlcov/
+
+# 分发/打包
+dist/
+build/
+*.egg-info/

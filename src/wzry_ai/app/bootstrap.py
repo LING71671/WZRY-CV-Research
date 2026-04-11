@@ -68,7 +68,7 @@ def _install_stderr_filter() -> None:
 
 
 def _prepend_adb_to_path(logger: logging.Logger) -> None:
-    config_module = import_module("config")
+    config_module = import_module("wzry_ai.config")
     adb_path = getattr(config_module, "ADB_PATH")
 
     adb_bin_dir = os.path.dirname(adb_path)
@@ -98,7 +98,7 @@ def bootstrap_runtime_environment() -> logging.Logger:
     """Prepare the runtime environment before importing the legacy entry."""
     global _BOOTSTRAPPED
 
-    logging_utils = import_module("utils.logging_utils")
+    logging_utils = import_module("wzry_ai.utils.logging_utils")
     setup_global_logging = getattr(logging_utils, "setup_global_logging")
     get_logger = getattr(logging_utils, "get_logger")
 
