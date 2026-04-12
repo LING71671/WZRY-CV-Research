@@ -11,6 +11,7 @@ from math import sqrt
 # 本地模块导入
 from wzry_ai.config import MINIMAP_SCALE_FACTOR, MOVE_DEADZONE, MOVE_INTERVAL  # 从配置导入移动相关参数
 from wzry_ai.config import KEY_MOVE_UP, KEY_MOVE_LEFT, KEY_MOVE_DOWN, KEY_MOVE_RIGHT  # 从配置导入方向按键
+from wzry_ai.config import CELL_SIZE, PATH_REPLAN_DISTANCE, CORRIDOR_TOLERANCE, LOOKAHEAD_DISTANCE  # 寻路配置
 from wzry_ai.config.heroes.mapping import get_hero_chinese  # 导入英雄中文名获取函数
 from wzry_ai.utils.keyboard_controller import press, release, tap  # 导入键盘按键控制函数
 from wzry_ai.utils.logging_utils import get_logger  # 导入日志获取函数
@@ -480,6 +481,13 @@ class UnifiedMovement:
         # 卡地形检测器实例
         self.stuck_detector = StuckDetector()
         self._last_stuck_log_time = 0   # 卡地形日志节流时间戳
+
+        # 路径跟随状态
+        self._pathfinder = None          # OptimizedAStarPathfinder（懒加载）
+        self._current_path = None        # [(grid_x, grid_y), ...] 路点列表
+        self._path_index = 0             # 当前路点索引
+        self._path_target_pos = None     # 此路径对应的目标网格坐标
+        self._last_replan_time = 0       # 上次规划时间
         
     def update_from_model2(self, self_pos, team_targets, class_names=None):
         """
@@ -673,12 +681,18 @@ class UnifiedMovement:
         
         # 使用传入的目标位置或 self.target_pos
         actual_target = target_pos if target_pos is not None else self.target_pos
-        
+
         # 没有目标，释放按键
         if not actual_target or not self_pos:
             self._release_all_keys()
             return
-        
+
+        # ===== 路径跟随（仅 model1 小地图坐标） =====
+        if self.source == 'model1':
+            waypoint = self._get_path_waypoint(self_pos, actual_target)
+            if waypoint is not None:
+                actual_target = waypoint
+
         # 计算原始方向向量（目标位置 - 自身位置）
         dx = actual_target[0] - self_pos[0]
         dy = actual_target[1] - self_pos[1]
@@ -737,8 +751,13 @@ class UnifiedMovement:
         
         # 检查是否卡住
         if is_stuck_result:
-            # 开始绕路
-            avoid_angle = self.stuck_detector.start_avoidance(original_angle)
+            # 路径感知：先强制重规划，再试绕路
+            if self._current_path is not None:
+                self._current_path = None
+                self.stuck_detector.stuck_confirm_count = 0
+            else:
+                # 开始绕路
+                avoid_angle = self.stuck_detector.start_avoidance(original_angle)
             if avoid_angle is not None:
                 # 使用绕路方向（100像素的移动向量）
                 final_dx = math.cos(avoid_angle) * 100
@@ -803,13 +822,124 @@ class UnifiedMovement:
             if self.key_status[key]:  # 如果该键处于按下状态
                 release(key)  # 释放该键
                 self.key_status[key] = False  # 更新状态为未按下
-                
+
     def clear(self):
         """清除目标（切换场景时用）"""
         self.target_pos = None
         self.target_name = None
         self.source = None
+        self._current_path = None
         self._release_all_keys()  # 释放所有按键
+
+    # ===== 路径跟随辅助方法 =====
+
+    def _get_pathfinder(self):
+        """懒加载寻路器。"""
+        if self._pathfinder is None:
+            from wzry_ai.detection.map_preprocessor import MapLayers
+            from wzry_ai.detection.pathfinding_optimized import OptimizedAStarPathfinder
+            self._pathfinder = OptimizedAStarPathfinder(MapLayers.get())
+        return self._pathfinder
+
+    def _get_path_waypoint(self, self_pos, target_pos):
+        """
+        计算或跟随路径，返回前瞻路点（小地图像素坐标）。
+        返回 None 时回退到直接向量跟随。
+        """
+        self_grid = (int(self_pos[0] / CELL_SIZE), int(self_pos[1] / CELL_SIZE))
+        target_grid = (int(target_pos[0] / CELL_SIZE), int(target_pos[1] / CELL_SIZE))
+
+        # 距离太近不需要寻路
+        if self._grid_distance(self_grid, target_grid) < 5:
+            self._current_path = None
+            return None
+
+        # 判断是否需要重新规划
+        need_replan = (
+            self._current_path is None
+            or self._path_target_pos is None
+            or self._grid_distance(target_grid, self._path_target_pos) > PATH_REPLAN_DISTANCE
+            or self._distance_to_path(self_grid) > CORRIDOR_TOLERANCE
+            or time.time() - self._last_replan_time > 3.0
+        )
+
+        if need_replan:
+            pathfinder = self._get_pathfinder()
+            path = pathfinder.find_path(self_grid, target_grid)
+            if path and len(path) >= 2:
+                self._current_path = path
+                self._path_index = 0
+                self._path_target_pos = target_grid
+                self._last_replan_time = time.time()
+                # 通知 localizer 有活跃路径
+                try:
+                    from wzry_ai.detection.map_constrained_localizer import MapConstrainedLocalizer
+                    MapConstrainedLocalizer.get().set_active_path(path)
+                except Exception:
+                    pass
+            else:
+                self._current_path = None
+                return None
+
+        # 推进路点索引
+        self._advance_path_index(self_grid)
+
+        # 找前瞻点
+        lookahead = self._find_lookahead(self_grid, LOOKAHEAD_DISTANCE)
+        if lookahead is None:
+            return None
+
+        # 转回小地图像素坐标
+        return (lookahead[0] * CELL_SIZE + CELL_SIZE / 2,
+                lookahead[1] * CELL_SIZE + CELL_SIZE / 2)
+
+    def _advance_path_index(self, self_grid):
+        """推进路点索引，跳过已到达的路点。"""
+        if self._current_path is None:
+            return
+        while self._path_index < len(self._current_path) - 1:
+            wp = self._current_path[self._path_index]
+            if self._grid_distance(self_grid, wp) < 3:
+                self._path_index += 1
+            else:
+                break
+
+    def _find_lookahead(self, self_grid, distance):
+        """找前方 distance 格处的路点。"""
+        if self._current_path is None:
+            return None
+
+        accumulated = 0.0
+        for i in range(self._path_index, len(self._current_path) - 1):
+            seg_len = self._grid_distance(
+                self._current_path[i], self._current_path[i + 1]
+            )
+            accumulated += seg_len
+            if accumulated >= distance:
+                return self._current_path[i + 1]
+
+        # 路径比前瞻距离短，返回终点
+        return self._current_path[-1]
+
+    def _distance_to_path(self, self_grid) -> float:
+        """当前位置到路径最近点的距离。"""
+        if self._current_path is None:
+            return float('inf')
+
+        start = max(0, self._path_index - 2)
+        end = min(len(self._current_path), self._path_index + 6)
+
+        min_dist = float('inf')
+        for i in range(start, end):
+            d = self._grid_distance(self_grid, self._current_path[i])
+            if d < min_dist:
+                min_dist = d
+        return min_dist
+
+    @staticmethod
+    def _grid_distance(a, b) -> float:
+        """两个网格坐标间的欧氏距离。"""
+        return sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
 
 # 全局移动控制器实例（单例模式）

@@ -135,6 +135,18 @@ from wzry_ai.config.base import (
     RETREAT_HP_THRESHOLD,             # 撤退血量阈值
     FIGHT_ENEMY_DISTANCE,             # 交战判定距离
     SAFE_DISTANCE_FOR_RECALL,         # 安全回城距离
+
+    # 地图预处理与寻路系统配置
+    HERO_INFLATION_RADIUS,            # 障碍物膨胀半径
+    PATHFINDING_MAX_ITERATIONS,       # A*最大迭代次数
+    CLEARANCE_PENALTY_THRESHOLD,      # 间距惩罚阈值
+    CLEARANCE_PENALTY_WEIGHT,         # 间距惩罚权重
+    TURN_PENALTY,                     # 转向惩罚
+    PATH_CACHE_SIZE,                  # 路径缓存大小
+    PATH_REPLAN_DISTANCE,             # 重规划距离阈值
+    SKELETON_MIN_CLEARANCE,           # 骨架最小间距
+    LOOKAHEAD_DISTANCE,               # 前瞻距离
+    CORRIDOR_TOLERANCE,               # 走廊容差
 )
 
 # ========== 从 templates 模块导入模板配置 ==========
@@ -236,7 +248,13 @@ __all__ = [
     'THREAT_HIGH_THRESHOLD', 'THREAT_MEDIUM_THRESHOLD',
     'FOCUS_FIRE_HP_DROP_RATE', 'FOCUS_FIRE_TIME_WINDOW',
     'RETREAT_HP_THRESHOLD', 'FIGHT_ENEMY_DISTANCE', 'SAFE_DISTANCE_FOR_RECALL',
-    
+
+    # 地图预处理与寻路系统配置
+    'HERO_INFLATION_RADIUS', 'PATHFINDING_MAX_ITERATIONS',
+    'CLEARANCE_PENALTY_THRESHOLD', 'CLEARANCE_PENALTY_WEIGHT', 'TURN_PENALTY',
+    'PATH_CACHE_SIZE', 'PATH_REPLAN_DISTANCE', 'SKELETON_MIN_CLEARANCE',
+    'LOOKAHEAD_DISTANCE', 'CORRIDOR_TOLERANCE',
+
     # templates模块导出的变量
     'TEMPLATE_ROI',
     'TEMPLATE_CONFIDENCE_THRESHOLDS',

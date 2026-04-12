@@ -236,3 +236,15 @@ MINIMAP_TO_SCREEN = {
 # 自动计算缩放比（避免硬编码）
 MINIMAP_SCALE_X = MINIMAP_TO_SCREEN["screen_w"] / MINIMAP_TO_SCREEN["fov_w"]  # ≈19.0
 MINIMAP_SCALE_Y = MINIMAP_TO_SCREEN["screen_h"] / MINIMAP_TO_SCREEN["fov_h"]  # ≈18.9
+
+# ========== 地图预处理与寻路系统配置 ==========
+HERO_INFLATION_RADIUS = 3          # 障碍物膨胀半径（网格单元，≈5 小地图像素）
+PATHFINDING_MAX_ITERATIONS = 2000  # A* 最大迭代次数
+CLEARANCE_PENALTY_THRESHOLD = 5.0  # 开始惩罚的间距阈值（网格单元）
+CLEARANCE_PENALTY_WEIGHT = 0.5     # 间距惩罚权重
+TURN_PENALTY = 0.3                 # 转向惩罚
+PATH_CACHE_SIZE = 50               # 路径缓存大小
+PATH_REPLAN_DISTANCE = 10          # 目标移动多少格触发重规划
+SKELETON_MIN_CLEARANCE = 3.0       # 骨架提取最小间距
+LOOKAHEAD_DISTANCE = 8             # 前瞻距离（网格单元，≈13 小地图像素）
+CORRIDOR_TOLERANCE = 5             # 走廊容差（网格单元）

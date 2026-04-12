@@ -58,6 +58,9 @@ from wzry_ai.config.keys import KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_M
 # 导入统一移动控制器
 from wzry_ai.movement.unified_movement import get_movement_controller
 
+# 导入地图约束定位器
+from wzry_ai.detection.map_constrained_localizer import MapConstrainedLocalizer
+
 # 移动控制函数（简单的方向移动）
 def move_direction(dx, dy):
     """使用键盘 WASD 移动"""
@@ -196,6 +199,13 @@ def run_fusion_logic_v2(skill_queue, pause_event, status_queue=None,
                 
                 # 只要有自身位置就更新卡地形检测器（不管有没有队友）
                 if g_center:
+                    # 地图约束定位滤波
+                    localizer = MapConstrainedLocalizer.get()
+                    localizer.update_keys(movement.key_status)
+                    fx, fy, conf = localizer.filter(g_center, current_time)
+                    if fx is not None and conf > 0.3:
+                        g_center = (fx, fy)
+
                     with _model1_data_lock:
                         latest_model1_data.clear()
                         latest_model1_data.update({
