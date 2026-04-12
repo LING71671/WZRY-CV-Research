@@ -5,7 +5,7 @@ import os  # 操作系统接口模块，用于文件路径操作
 import pickle  # 序列化模块，用于保存和加载特征数据
 import time  # 时间模块，用于记录特征创建时间戳
 from dataclasses import dataclass  # 数据类装饰器，用于创建简单的数据容器类
-from typing import Optional  # 类型提示，表示可选参数
+from typing import Any, Optional  # 类型提示，表示可选参数
 
 # 导入第三方库
 import cv2  # OpenCV库，用于图像处理和特征提取
@@ -56,7 +56,7 @@ class HeroFeatureLearner:
         0.40  # 模板匹配回退阈值，模板置信度在此范围内时启用深度学习
     )
 
-    def __init__(self, feature_db_path: str = None):
+    def __init__(self, feature_db_path: Optional[str] = None):
         """
         初始化英雄特征学习器
 
@@ -71,6 +71,10 @@ class HeroFeatureLearner:
         self.features: dict[
             str, list[HeroFeature]
         ] = {}  # 特征字典，键是英雄名，值是该英雄的特征列表
+        self.model: Any | None = None
+        self.transform: Any | None = None
+        self.net: Any | None = None
+        self.use_torch = False
         self._load_features()  # 从文件加载已保存的特征数据
         self._init_feature_extractor()  # 初始化特征提取器（PyTorch或OpenCV）
 
@@ -92,13 +96,14 @@ class HeroFeatureLearner:
             import torchvision.transforms as transforms  # 图像预处理变换
 
             # 加载预训练的MobileNetV2模型
-            self.model = models.mobilenet_v2(pretrained=True)
+            model: Any = models.mobilenet_v2(pretrained=True)
             # 将分类器替换为Identity层，使其输出特征向量而非分类结果
-            self.model.classifier = torch.nn.Identity()
+            model.classifier = torch.nn.Identity()
             # 设置模型为评估模式（禁用dropout等训练专用层）
-            self.model.eval()
+            model.eval()
 
             # 定义图像预处理流程
+            self.model = model
             self.transform = transforms.Compose(
                 [
                     transforms.ToPILImage(),  # 将NumPy数组转换为PIL图像
@@ -200,7 +205,7 @@ class HeroFeatureLearner:
         根据初始化时确定的特征提取方式，调用对应的特征提取方法
         """
         # 根据初始化时设置的标志选择特征提取方法
-        if self.use_torch:
+        if self.use_torch and self.model is not None and self.transform is not None:
             # 使用PyTorch深度学习模型提取特征
             return self._extract_torch_features(img)
         elif self.net is not None:
@@ -228,18 +233,22 @@ class HeroFeatureLearner:
         """
         import torch  # 在方法内导入torch，避免模块级别依赖
 
+        if self.model is None or self.transform is None:
+            return self._extract_histogram_features(img)
+
         # 将BGR格式转换为RGB格式（PyTorch模型需要RGB输入）
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # 应用预处理变换并增加batch维度（unsqueeze(0)）
-        input_tensor = self.transform(img_rgb).unsqueeze(0)
+        transformed: Any = self.transform(img_rgb)
+        input_tensor: Any = transformed.unsqueeze(0)
 
         # 使用torch.no_grad()禁用梯度计算，提高推理速度并减少内存使用
         with torch.no_grad():
             # 前向传播获取特征
-            features = self.model(input_tensor)
+            features: Any = self.model(input_tensor)
 
         # 将PyTorch张量转换为NumPy数组并展平为一维向量
-        return features.numpy().flatten()
+        return np.asarray(features.numpy()).flatten()
 
     def _extract_opencv_features(self, img: np.ndarray) -> np.ndarray:
         """
@@ -254,6 +263,9 @@ class HeroFeatureLearner:
         功能说明：
         使用OpenCV的blobFromImage创建输入blob，通过DNN网络前向传播提取特征
         """
+        if self.net is None:
+            return self._extract_histogram_features(img)
+
         # 创建输入blob，进行预处理（调整大小、减去均值、交换RB通道）
         blob = cv2.dnn.blobFromImage(
             img,

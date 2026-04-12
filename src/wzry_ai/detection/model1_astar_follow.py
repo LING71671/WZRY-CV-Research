@@ -1,4 +1,3 @@
-# pyright: reportPrivateImportUsage=false, reportArgumentType=false, reportFunctionMemberAccess=false
 """
 模态1（小地图）A* 寻路跟随模块
 
@@ -21,9 +20,6 @@ from math import sqrt
 
 # 导入time模块用于时间相关操作
 import time
-
-# 导入YOLO模型（虽然在此文件中未直接使用，但保留以备扩展）
-from ultralytics import YOLO
 
 # 从keyboard_controller导入按键控制函数
 from wzry_ai.utils.keyboard_controller import press, release
@@ -83,6 +79,8 @@ key_status = {
 }
 # 全局变量：记录上次执行移动指令的时间戳
 last_move_time = 0
+# 记录移动日志时间戳，避免依赖函数属性
+move_direction_last_log_time = 0.0
 
 # 定义优先跟随的英雄列表（中文名），会自动转换为拼音_blue格式
 _priority_heroes_raw = [
@@ -161,7 +159,7 @@ def a_star(start, goal, obstacle_map):
     open_set = []  # 开放列表，存储待探索的节点
     heappush(open_set, (0, Node(start[0], start[1], 0)))  # 将起点加入开放列表
     closed_set = set()  # 关闭列表，存储已探索的节点
-    g_score = {start: 0}  # 记录从起点到各节点的实际代价
+    g_score: dict[tuple[int, int], float] = {start: 0.0}  # 记录从起点到各节点的实际代价
     while open_set:
         current_node = heappop(open_set)[1]  # 取出代价最小的节点
         current = (current_node.x, current_node.y)  # 获取当前节点坐标
@@ -191,8 +189,8 @@ def a_star(start, goal, obstacle_map):
                 and 0 <= neighbor[1] < GRID_SIZE
                 and obstacle_map[neighbor[1], neighbor[0]] == 0
             ):
-                move_cost = sqrt(2) if dx != 0 and dy != 0 else 1  # 斜线移动代价更高
-                tentative_g_score = (
+                move_cost = sqrt(2) if dx != 0 and dy != 0 else 1.0  # 斜线移动代价更高
+                tentative_g_score = float(
                     g_score[current] + move_cost
                 )  # 计算到邻居的 tentative 代价
                 # 如果邻居已在关闭列表且新代价不更优，跳过
@@ -239,7 +237,7 @@ def move_direction(dx, dy, target_name=None, target_x=None, target_y=None):
     dx, dy: 目标方向向量
     target_name, target_x, target_y: 目标信息（用于日志）
     """
-    global last_move_time  # 使用全局上次移动时间变量
+    global last_move_time, move_direction_last_log_time  # 使用全局上次移动时间变量
     current_time = time.time()  # 获取当前时间戳
 
     # 检查是否满足移动间隔要求，避免过于频繁的按键操作
@@ -288,14 +286,13 @@ def move_direction(dx, dy, target_name=None, target_x=None, target_y=None):
         key_status[key] = new_keys[key]  # 更新按键状态
 
     # 每0.5秒输出一次移动日志（更及时看到效果）
-    if (
-        active_keys
-        and (current_time - getattr(move_direction, "_last_log_time", 0)) > 0.5
-    ):
-        target_info = (
-            f" -> {target_name}({int(target_x)},{int(target_y)})" if target_name else ""
-        )
-        move_direction._last_log_time = current_time  # 更新上次日志时间
+    if active_keys and (current_time - move_direction_last_log_time) > 0.5:
+        if target_name is not None and target_x is not None and target_y is not None:
+            target_info = f" -> {target_name}({int(target_x)},{int(target_y)})"
+        else:
+            target_info = ""
+        _ = target_info
+        move_direction_last_log_time = current_time  # 更新上次日志时间
 
     last_move_time = current_time  # 更新上次移动时间
 

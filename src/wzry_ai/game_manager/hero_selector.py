@@ -501,7 +501,9 @@ class HeroSelector:
         logger.warning(f"主界面未找到可用优先级英雄，进入分路选择")
         return self._enter_lane_select_flow(img_gray)
 
-    def _reset_selection_state(self, completed: bool = False, hero_key: str = None):
+    def _reset_selection_state(
+        self, completed: bool = False, hero_key: Optional[str] = None
+    ):
         """
         重置选择状态
 
@@ -607,7 +609,7 @@ class HeroSelector:
     def _select_hero_in_lane(
         self,
         img_gray,
-        current_lane: str,
+        current_lane: Optional[str],
         target_lane: str = "lane_support",
         img_color=None,
     ) -> HeroSelectResult:
@@ -638,7 +640,11 @@ class HeroSelector:
             "lane_support": "游走",
             "all_lane": "全部分路",
         }
-        current_lane_name = lane_name_map.get(current_lane, current_lane)
+        current_lane_name = (
+            lane_name_map.get(current_lane, current_lane)
+            if current_lane is not None
+            else "未知分路"
+        )
         target_lane_name = lane_name_map.get(target_lane, target_lane)
 
         # 构建模板名称
@@ -982,7 +988,9 @@ class HeroSelector:
         # 第二步：优先返回高亮状态的分路
         if highlight_lanes:
             # 找到置信度最高的高亮分路
-            best_highlight = max(highlight_lanes, key=highlight_lanes.get)
+            best_highlight = max(
+                highlight_lanes, key=lambda lane_key: highlight_lanes[lane_key]
+            )
             best_highlight_conf = highlight_lanes[best_highlight]
 
             # 检测到all_lane或至少1个分路就认为是分路界面
@@ -1001,7 +1009,9 @@ class HeroSelector:
 
         # 第三步：没有高亮分路，返回检测到的第一个灰度分路
         if detected_lanes:
-            best_gray = max(detected_lanes, key=detected_lanes.get)
+            best_gray = max(
+                detected_lanes, key=lambda lane_key: detected_lanes[lane_key]
+            )
             best_gray_conf = detected_lanes[best_gray]
 
             # 检测到all_lane或至少1个分路就认为是分路界面
@@ -1412,7 +1422,7 @@ class HeroSelector:
         scores[status2] += conf2 * weight2
 
         # 选择分数最高的状态
-        max_status = max(scores, key=scores.get)
+        max_status = max(scores, key=lambda status: scores[status])
         total_score = sum(scores.values())
         normalized_conf = scores[max_status] / total_score if total_score > 0 else 0.5
 

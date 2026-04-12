@@ -15,7 +15,7 @@ import os  # 操作系统模块，用于文件路径检查
 import cv2  # OpenCV库，用于图像处理和模板匹配
 import numpy as np  # NumPy库，用于数值计算
 import time  # 时间模块，用于性能统计
-from typing import Tuple, List, Optional, Dict  # 类型提示
+from typing import Any, Tuple, List, Optional, Dict  # 类型提示
 from dataclasses import dataclass  # 数据类装饰器
 
 # 尝试导入配置模块中的默认模板置信度阈值
@@ -34,10 +34,10 @@ logger = get_logger(__name__)
 
 # 尝试导入MTM多模板匹配库
 try:
-    import MTM
-
+    MTM: Any = __import__("MTM")
     MTM_AVAILABLE = True  # 标记MTM库可用
 except ImportError:
+    MTM = None
     MTM_AVAILABLE = False  # 标记MTM库不可用
     logger.warning("MTM 库未安装，将使用传统单模板匹配")
 
@@ -122,7 +122,7 @@ class TemplateMatcher:
         }
 
         # 保存上一帧BGR图像，用于RGB亮度验证
-        self._last_frame: np.ndarray = None
+        self._last_frame: Optional[np.ndarray] = None
 
         # 需要RGB验证的模板集合（用于判断UI元素选中状态）
         # 这些模板匹配后，会通过亮度检测判断是高亮(选中)还是灰度(未选中)
@@ -440,7 +440,7 @@ class TemplateMatcher:
         self,
         template_name: str,
         img_gray: np.ndarray,
-        min_confidence: float = None,
+        min_confidence: Optional[float] = None,
         use_roi: bool = True,
     ) -> MatchResult:
         """
@@ -696,7 +696,7 @@ class TemplateMatcher:
         使用MTM库一次性匹配所有已加载的模板，返回所有匹配结果
         """
         # 检查MTM是否可用且模板不为空
-        if not self.use_mtm or not self.templates:
+        if not self.use_mtm or MTM is None or not self.templates:
             return False, None, []
 
         # 增加MTM调用次数统计
@@ -757,7 +757,7 @@ class TemplateMatcher:
         template_name: str,
         template: np.ndarray,
         img_gray: np.ndarray,
-        min_confidence: float,
+        min_confidence: Optional[float],
     ) -> MatchResult:
         """
         使用MTM检测单个模板
@@ -776,6 +776,11 @@ class TemplateMatcher:
         2. 使用MTM进行单模板匹配
         3. 将匹配坐标转换回原始尺寸
         """
+        if MTM is None:
+            return self._detect_traditional(
+                template_name, template, img_gray, min_confidence
+            )
+
         try:
             # 缩放图像和模板以提高匹配速度
             # 注意：不使用缓存，因为img_gray可能是ROI裁剪后的临时对象，
@@ -866,6 +871,19 @@ class TemplateMatcher:
         2. 使用MTM一次性匹配所有模板
         3. 将结果坐标转换回原始尺寸
         """
+        if MTM is None:
+            results = []
+            for name in template_names:
+                template = self.templates.get(name)
+                if template is None:
+                    continue
+                result = self._detect_traditional(
+                    name, template, img_gray, min_confidence
+                )
+                if result.found:
+                    results.append(result)
+            return results
+
         try:
             # 构建模板列表，使用预缩放缓存
             template_list = []
@@ -955,7 +973,7 @@ class TemplateMatcher:
         template_name: str,
         template: np.ndarray,
         img_gray: np.ndarray,
-        min_confidence: float,
+        min_confidence: Optional[float],
     ) -> MatchResult:
         """
         使用传统OpenCV模板匹配方法
@@ -1235,4 +1253,4 @@ class TemplateMatcher:
                 # 亮度 >= 阈值，不匹配（实际是高亮）
                 score = max(0.0, (threshold - brightness) / 50)
 
-        return score
+        return float(score)

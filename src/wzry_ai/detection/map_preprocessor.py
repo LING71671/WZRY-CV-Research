@@ -64,7 +64,9 @@ def generate_binary_grid(image_path: str, grid_size: int = 210) -> np.ndarray:
     return binary
 
 
-def generate_inflated_map(binary_grid: np.ndarray, inflation_radius: int = 4) -> np.ndarray:
+def generate_inflated_map(
+    binary_grid: np.ndarray, inflation_radius: int = 4
+) -> np.ndarray:
     """
     膨胀障碍图 - 按英雄半径+安全边距膨胀障碍物。
 
@@ -111,8 +113,14 @@ def _zhang_suen_thinning(binary_mask: np.ndarray) -> np.ndarray:
     def _neighbors(img, r, c):
         """按 Zhang-Suen 顺序返回 8 邻域: P2,P3,...,P9"""
         return [
-            img[r - 1, c], img[r - 1, c + 1], img[r, c + 1], img[r + 1, c + 1],
-            img[r + 1, c], img[r + 1, c - 1], img[r, c - 1], img[r - 1, c - 1],
+            img[r - 1, c],
+            img[r - 1, c + 1],
+            img[r, c + 1],
+            img[r + 1, c + 1],
+            img[r + 1, c],
+            img[r + 1, c - 1],
+            img[r, c - 1],
+            img[r - 1, c - 1],
         ]
 
     def _transitions(neighbors):
@@ -156,15 +164,18 @@ def _zhang_suen_thinning(binary_mask: np.ndarray) -> np.ndarray:
 
 def _thin_skeleton(binary_mask: np.ndarray) -> np.ndarray:
     """提取骨架，优先用 cv2.ximgproc，回退到 Zhang-Suen。"""
-    try:
-        return cv2.ximgproc.thinning(
-            binary_mask * 255, thinningType=cv2.ximgproc.THINNING_ZHANGSUEN
-        ) // 255
-    except AttributeError:
-        return _zhang_suen_thinning(binary_mask)
+    ximgproc = getattr(cv2, "ximgproc", None)
+    if ximgproc is not None:
+        thinning = getattr(ximgproc, "thinning", None)
+        thinning_type = getattr(ximgproc, "THINNING_ZHANGSUEN", None)
+        if thinning is not None and thinning_type is not None:
+            return thinning(binary_mask * 255, thinningType=thinning_type) // 255
+    return _zhang_suen_thinning(binary_mask)
 
 
-def generate_skeleton_graph(clearance_map: np.ndarray, min_clearance: float = 3.0) -> dict:
+def generate_skeleton_graph(
+    clearance_map: np.ndarray, min_clearance: float = 3.0
+) -> dict:
     """
     从 clearance map 提取骨架走廊图。
 
@@ -226,8 +237,7 @@ def generate_skeleton_graph(clearance_map: np.ndarray, min_clearance: float = 3.
     # BFS 沿骨架追踪边：从每个节点出发，沿骨架走到下一个节点
     edges = []
     edge_set = set()  # 避免重复边
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1),
-                  (-1, -1), (-1, 1), (1, -1), (1, 1)]
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
     for start_idx, (sx, sy) in enumerate(nodes):
         sr, sc = sy, sx  # 转回 (row, col)
@@ -242,8 +252,9 @@ def generate_skeleton_graph(clearance_map: np.ndarray, min_clearance: float = 3.
                 end_idx = node_map[(nr, nc)]
                 edge_key = (min(start_idx, end_idx), max(start_idx, end_idx))
                 if edge_key not in edge_set:
-                    cost = sqrt((sx - nodes[end_idx][0])**2 +
-                                (sy - nodes[end_idx][1])**2)
+                    cost = sqrt(
+                        (sx - nodes[end_idx][0]) ** 2 + (sy - nodes[end_idx][1]) ** 2
+                    )
                     edges.append((start_idx, end_idx, cost))
                     edge_set.add(edge_key)
                 continue
@@ -288,10 +299,10 @@ def generate_skeleton_graph(clearance_map: np.ndarray, min_clearance: float = 3.
 
     logger.info(f"骨架图: {len(nodes)} 节点, {len(edges)} 边")
     return {
-        'skeleton_mask': skeleton,
-        'nodes': nodes,
-        'edges': edges,
-        'adjacency': adjacency,
+        "skeleton_mask": skeleton,
+        "nodes": nodes,
+        "edges": edges,
+        "adjacency": adjacency,
     }
 
 
@@ -307,16 +318,18 @@ class MapLayers:
     _instance = None
 
     def __init__(self):
-        self.binary_grid = None       # (210,210) uint8
-        self.inflated_map = None      # (210,210) uint8
-        self.clearance_map = None     # (210,210) float32
-        self.skeleton_mask = None     # (210,210) uint8
-        self.skeleton_nodes = []      # [(x,y), ...]
-        self.skeleton_edges = []      # [(i, j, cost), ...]
-        self.skeleton_adjacency = {}  # {node_idx: [(neighbor_idx, cost), ...]}
+        self.binary_grid: np.ndarray | None = None  # (210,210) uint8
+        self.inflated_map: np.ndarray | None = None  # (210,210) uint8
+        self.clearance_map: np.ndarray | None = None  # (210,210) float32
+        self.skeleton_mask: np.ndarray | None = None  # (210,210) uint8
+        self.skeleton_nodes: list[tuple[int, int]] = []  # [(x,y), ...]
+        self.skeleton_edges: list[tuple[int, int, float]] = []  # [(i, j, cost), ...]
+        self.skeleton_adjacency: dict[
+            int, list[tuple[int, float]]
+        ] = {}  # {node_idx: [(neighbor_idx, cost), ...]}
 
     @classmethod
-    def get(cls) -> 'MapLayers':
+    def get(cls) -> "MapLayers":
         if cls._instance is None:
             cls._instance = cls()
             cls._instance._load()
@@ -348,13 +361,18 @@ class MapLayers:
                 self.binary_grid = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.uint8)
                 logger.warning("无地图数据，使用空白网格")
 
+        binary_grid = self.binary_grid
+        if binary_grid is None:
+            raise RuntimeError("二值网格加载失败")
+
         # 膨胀图
         if os.path.exists(inflated_path):
             self.inflated_map = np.load(inflated_path)
         else:
             from wzry_ai.config.base import HERO_INFLATION_RADIUS
+
             self.inflated_map = generate_inflated_map(
-                self.binary_grid, HERO_INFLATION_RADIUS
+                binary_grid, HERO_INFLATION_RADIUS
             )
             logger.info("实时生成膨胀障碍图")
 
@@ -362,37 +380,48 @@ class MapLayers:
         if os.path.exists(clearance_path):
             self.clearance_map = np.load(clearance_path)
         else:
-            self.clearance_map = generate_clearance_map(self.binary_grid)
+            self.clearance_map = generate_clearance_map(binary_grid)
             logger.info("实时生成距离场")
+
+        clearance_map = self.clearance_map
+        if clearance_map is None:
+            raise RuntimeError("距离场加载失败")
 
         # 骨架图
         if os.path.exists(skeleton_path):
             data = np.load(skeleton_path, allow_pickle=True)
-            self.skeleton_mask = data['skeleton_mask']
-            self.skeleton_nodes = data['nodes'].tolist()
-            self.skeleton_edges = data['edges'].tolist()
-            self.skeleton_adjacency = data['adjacency'].item()
+            self.skeleton_mask = data["skeleton_mask"]
+            self.skeleton_nodes = data["nodes"].tolist()
+            self.skeleton_edges = data["edges"].tolist()
+            self.skeleton_adjacency = data["adjacency"].item()
         else:
             from wzry_ai.config.base import SKELETON_MIN_CLEARANCE
-            result = generate_skeleton_graph(
-                self.clearance_map, SKELETON_MIN_CLEARANCE
-            )
-            self.skeleton_mask = result['skeleton_mask']
-            self.skeleton_nodes = result['nodes']
-            self.skeleton_edges = result['edges']
-            self.skeleton_adjacency = result['adjacency']
+
+            result = generate_skeleton_graph(clearance_map, SKELETON_MIN_CLEARANCE)
+            self.skeleton_mask = result["skeleton_mask"]
+            self.skeleton_nodes = result["nodes"]
+            self.skeleton_edges = result["edges"]
+            self.skeleton_adjacency = result["adjacency"]
             logger.info("实时生成骨架走廊图")
+
+    def _require_navigation_maps(self) -> tuple[np.ndarray, np.ndarray]:
+        """返回已加载的膨胀图和距离场。"""
+        if self.inflated_map is None or self.clearance_map is None:
+            raise RuntimeError("地图预处理层尚未加载完成")
+        return self.inflated_map, self.clearance_map
 
     def is_walkable(self, gx: int, gy: int) -> bool:
         """检查膨胀图上该格是否可走。"""
-        if 0 <= gy < self.inflated_map.shape[0] and 0 <= gx < self.inflated_map.shape[1]:
-            return self.inflated_map[gy, gx] == 0
+        inflated_map, _ = self._require_navigation_maps()
+        if 0 <= gy < inflated_map.shape[0] and 0 <= gx < inflated_map.shape[1]:
+            return inflated_map[gy, gx] == 0
         return False
 
     def get_clearance(self, gx: int, gy: int) -> float:
         """获取该格到最近障碍的距离。"""
-        if 0 <= gy < self.clearance_map.shape[0] and 0 <= gx < self.clearance_map.shape[1]:
-            return float(self.clearance_map[gy, gx])
+        _, clearance_map = self._require_navigation_maps()
+        if 0 <= gy < clearance_map.shape[0] and 0 <= gx < clearance_map.shape[1]:
+            return float(clearance_map[gy, gx])
         return 0.0
 
     def snap_to_walkable(self, gx: int, gy: int, max_radius: int = 10) -> tuple:
@@ -403,7 +432,8 @@ class MapLayers:
         if self.is_walkable(gx, gy):
             return (gx, gy)
 
-        rows, cols = self.inflated_map.shape
+        inflated_map, _ = self._require_navigation_maps()
+        rows, cols = inflated_map.shape
         visited = set()
         queue = deque([(gx, gy, 0)])
         visited.add((gx, gy))
@@ -426,10 +456,16 @@ class MapLayers:
 # ==================== 预处理主入口 ====================
 
 
-def preprocess_and_save(data_dir: str, image_path: str, grid_size: int = 210,
-                        inflation_radius: int = None, min_clearance: float = None):
+def preprocess_and_save(
+    data_dir: str,
+    image_path: str,
+    grid_size: int = 210,
+    inflation_radius: int | None = None,
+    min_clearance: float | None = None,
+):
     """运行完整预处理管线并保存到 data/ 目录。"""
     from wzry_ai.config.base import HERO_INFLATION_RADIUS, SKELETON_MIN_CLEARANCE
+
     if inflation_radius is None:
         inflation_radius = HERO_INFLATION_RADIUS
     if min_clearance is None:
@@ -466,10 +502,10 @@ def preprocess_and_save(data_dir: str, image_path: str, grid_size: int = 210,
     skel = generate_skeleton_graph(clearance, min_clearance)
     np.savez(
         os.path.join(data_dir, "map_skeleton_graph.npz"),
-        skeleton_mask=skel['skeleton_mask'],
-        nodes=np.array(skel['nodes'], dtype=object),
-        edges=np.array(skel['edges'], dtype=object),
-        adjacency=skel['adjacency'],
+        skeleton_mask=skel["skeleton_mask"],
+        nodes=np.array(skel["nodes"], dtype=object),
+        edges=np.array(skel["edges"], dtype=object),
+        adjacency=skel["adjacency"],
     )
 
     logger.info("地图预处理完成，文件已保存到 data/")

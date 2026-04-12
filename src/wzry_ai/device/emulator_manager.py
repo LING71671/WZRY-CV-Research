@@ -37,7 +37,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 
 # 从类型提示模块导入类型定义
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, cast
 
 # 尝试导入Windows GUI库（仅在Windows平台可用）
 try:
@@ -49,6 +49,8 @@ try:
     HAS_WIN32 = True
 except ImportError:
     # win32库不可用（可能在非Windows平台）
+    win32gui = None
+    win32con = None
     HAS_WIN32 = False
 
 # 从日志工具模块导入获取日志记录器函数
@@ -115,15 +117,18 @@ class ADBPathFinder:
         """
         # 尝试导入 psutil
         try:
-            import psutil
+            import psutil as psutil_local
 
             HAS_PSUTIL_LOCAL = True
         except ImportError:
+            psutil_local = None
             HAS_PSUTIL_LOCAL = False
 
         # 使用 psutil 获取进程信息
         if HAS_PSUTIL_LOCAL:
-            for proc in psutil.process_iter(["pid", "name", "exe"]):
+            if psutil_local is None:
+                return None
+            for proc in psutil_local.process_iter(["pid", "name", "exe"]):
                 try:
                     if proc.info["name"] in MUMU_PROCESS_NAMES:
                         exe_path = proc.info["exe"]
@@ -158,7 +163,7 @@ class ADBPathFinder:
                                     f"从 MuMu 进程 '{proc.info['name']}' 推导出 ADB: {adb_path}"
                                 )
                                 return adb_path
-                except (psutil.NoSuchProcess, psutil.AccessDenied, OSError):
+                except (psutil_local.NoSuchProcess, psutil_local.AccessDenied, OSError):
                     continue
 
         # 如果 psutil 不可用，尝试使用 ctypes/win32process 获取进程路径
@@ -263,7 +268,7 @@ class ADBPathFinder:
         return None
 
     @classmethod
-    def find_adb_path(cls, emulator_type: str = None) -> str:
+    def find_adb_path(cls, emulator_type: Optional[str] = None) -> str:
         """
         查找ADB可执行文件路径
 
@@ -319,7 +324,7 @@ class ADBPathFinder:
         return "adb"
 
     @classmethod
-    def _check_paths(cls, paths: list) -> str:
+    def _check_paths(cls, paths: list[str]) -> Optional[str]:
         """
         检查路径列表，返回第一个存在的文件
 
@@ -340,7 +345,7 @@ class ADBPathFinder:
         return None
 
     @classmethod
-    def _find_system_adb(cls) -> str:
+    def _find_system_adb(cls) -> Optional[str]:
         """
         查找系统PATH中的adb
 
@@ -382,7 +387,7 @@ class ADBPathFinder:
         return None
 
     @classmethod
-    def _scan_disk_for_adb(cls, emulator_type: str = None) -> str:
+    def _scan_disk_for_adb(cls, emulator_type: Optional[str] = None) -> Optional[str]:
         """
         全盘扫描 adb.exe
 
@@ -462,7 +467,7 @@ class ADBPathFinder:
 _ADB_PATH = None
 
 
-def get_adb_path(emulator_type: str = None, auto_save: bool = True) -> str:
+def get_adb_path(emulator_type: Optional[str] = None, auto_save: bool = True) -> str:
     """
     获取ADB路径（带缓存功能）
 
@@ -496,7 +501,7 @@ def get_adb_path(emulator_type: str = None, auto_save: bool = True) -> str:
         if _ADB_PATH and _ADB_PATH != "adb":
             MuMuConfigManager.save_adb_path(_ADB_PATH)
     # 返回缓存的ADB路径
-    return _ADB_PATH
+    return _ADB_PATH or "adb"
 
 
 # 检查win32库是否可用
@@ -561,7 +566,7 @@ class EmulatorPortFinder:
     EMULATOR_PORTS = EMULATOR_PORTS
     EMULATOR_MODELS = EMULATOR_MODELS
 
-    def __init__(self, adb_path: str = None):
+    def __init__(self, adb_path: Optional[str] = None):
         """
         初始化端口查找器
 
@@ -578,7 +583,7 @@ class EmulatorPortFinder:
         self._load_device_models()
 
     def find_port(
-        self, prefer_cached: bool = True, emulator_type: str = None
+        self, prefer_cached: bool = True, emulator_type: Optional[str] = None
     ) -> Tuple[Optional[int], Optional[str]]:
         """
         查找模拟器端口
@@ -650,7 +655,8 @@ class EmulatorPortFinder:
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
             # 1. 尝试连接
-            cmd = f"{self.adb_path} connect {serial}"
+            adb_path = self.adb_path
+            cmd = f"{adb_path} connect {serial}"
             result = subprocess.run(
                 cmd, shell=True, capture_output=True, timeout=2, startupinfo=startupinfo
             )
@@ -668,7 +674,7 @@ class EmulatorPortFinder:
                 return False
 
             # 2. 验证设备是否真正可用（执行一个简单的 adb 命令）
-            test_cmd = f"{self.adb_path} -s {serial} shell echo ok"
+            test_cmd = f"{adb_path} -s {serial} shell echo ok"
             test_result = subprocess.run(
                 test_cmd,
                 shell=True,
@@ -704,7 +710,8 @@ class EmulatorPortFinder:
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
             # 获取设备型号
-            cmd = f"{self.adb_path} -s 127.0.0.1:{port} shell getprop ro.product.model"
+            adb_path = self.adb_path
+            cmd = f"{adb_path} -s 127.0.0.1:{port} shell getprop ro.product.model"
             result = subprocess.run(
                 cmd, shell=True, capture_output=True, timeout=5, startupinfo=startupinfo
             )
@@ -718,7 +725,9 @@ class EmulatorPortFinder:
                         return emu_type
 
             # 如果型号不匹配，尝试通过制造商判断
-            cmd = f"{self.adb_path} -s 127.0.0.1:{port} shell getprop ro.product.manufacturer"
+            cmd = (
+                f"{adb_path} -s 127.0.0.1:{port} shell getprop ro.product.manufacturer"
+            )
             result = subprocess.run(
                 cmd, shell=True, capture_output=True, timeout=5, startupinfo=startupinfo
             )
@@ -862,6 +871,7 @@ try:
 
     HAS_PSUTIL = True
 except ImportError:
+    psutil = None
     HAS_PSUTIL = False
     logger.debug("psutil 未安装，将使用 win32process 进行进程查找")
 
@@ -871,6 +881,7 @@ try:
 
     HAS_WIN32PROCESS = True
 except ImportError:
+    win32process = None
     HAS_WIN32PROCESS = False
 
 
@@ -916,9 +927,13 @@ class EmulatorWindowFinder:
         返回：
             列表，每个元素为 (hwnd, title, rect, 'mumu')
         """
-        if not HAS_WIN32PROCESS:
+        if win32gui is None or win32process is None:
             logger.debug("win32process 不可用，跳过进程名匹配")
             return []
+
+        win32gui_module = cast(Any, win32gui)
+        win32process_module = cast(Any, win32process)
+        psutil_module = cast(Any, psutil) if psutil is not None else None
 
         logger.debug(f"进程名匹配: 开始扫描进程，目标进程名: {MUMU_PROCESS_NAMES}")
 
@@ -926,10 +941,10 @@ class EmulatorWindowFinder:
         mumu_pids = set()
         found_processes = []  # 记录找到的进程详情用于调试
 
-        if HAS_PSUTIL:
+        if psutil_module is not None:
             # 使用 psutil 获取进程信息
             try:
-                for proc in psutil.process_iter(["pid", "name"]):
+                for proc in psutil_module.process_iter(["pid", "name"]):
                     try:
                         proc_name = proc.info["name"]
                         if proc_name in MUMU_PROCESS_NAMES:
@@ -937,7 +952,7 @@ class EmulatorWindowFinder:
                             found_processes.append(
                                 f"{proc_name}(PID={proc.info['pid']})"
                             )
-                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    except (psutil_module.NoSuchProcess, psutil_module.AccessDenied):
                         continue
             except Exception as e:
                 logger.debug(f"psutil 获取进程信息失败: {e}")
@@ -1027,11 +1042,11 @@ class EmulatorWindowFinder:
         def callback(hwnd, _):
             nonlocal skipped_tool
             try:
-                if win32gui.IsWindowVisible(hwnd):
-                    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+                if win32gui_module.IsWindowVisible(hwnd):
+                    _, pid = win32process_module.GetWindowThreadProcessId(hwnd)
                     if pid in mumu_pids:
                         # 排除工具窗口
-                        cls_name = win32gui.GetClassName(hwnd)
+                        cls_name = win32gui_module.GetClassName(hwnd)
                         if any(
                             excluded in cls_name for excluded in EXCLUDED_CLASS_NAMES
                         ):
@@ -1039,8 +1054,8 @@ class EmulatorWindowFinder:
                             logger.debug(f"进程匹配: 跳过工具窗口 (class='{cls_name}')")
                             return
 
-                        title = win32gui.GetWindowText(hwnd)
-                        rect = win32gui.GetWindowRect(hwnd)
+                        title = win32gui_module.GetWindowText(hwnd)
+                        rect = win32gui_module.GetWindowRect(hwnd)
                         # 过滤掉太小的窗口（可能是工具窗口）
                         w = rect[2] - rect[0]
                         h = rect[3] - rect[1]
@@ -1050,7 +1065,7 @@ class EmulatorWindowFinder:
             except Exception as e:
                 pass
 
-        win32gui.EnumWindows(callback, None)
+        win32gui_module.EnumWindows(callback, None)
 
         if skipped_tool > 0:
             logger.debug(f"进程名匹配: 跳过 {skipped_tool} 个工具窗口")
@@ -1070,6 +1085,15 @@ class EmulatorWindowFinder:
         skipped_non_mumu = 0  # 记录因进程名不匹配而跳过的窗口数
         skipped_tool_window = 0  # 记录因工具窗口而跳过的窗口数
 
+        if win32gui is None:
+            return results
+
+        win32gui_module = cast(Any, win32gui)
+        win32process_module = (
+            cast(Any, win32process) if win32process is not None else None
+        )
+        psutil_module = cast(Any, psutil) if psutil is not None else None
+
         logger.debug(f"类名匹配: 开始扫描窗口，目标类名: {MUMU_CLASS_NAMES}")
 
         # 需要排除的工具窗口类名（这些不是渲染窗口）
@@ -1085,13 +1109,13 @@ class EmulatorWindowFinder:
         def callback(hwnd, _):
             nonlocal skipped_non_mumu, skipped_tool_window
             try:
-                if win32gui.IsWindowVisible(hwnd):
-                    cls_name = win32gui.GetClassName(hwnd)
+                if win32gui_module.IsWindowVisible(hwnd):
+                    cls_name = win32gui_module.GetClassName(hwnd)
 
                     # 排除工具窗口（这些不是渲染窗口）
                     if any(excluded in cls_name for excluded in EXCLUDED_CLASS_NAMES):
                         skipped_tool_window += 1
-                        title = win32gui.GetWindowText(hwnd)
+                        title = win32gui_module.GetWindowText(hwnd)
                         logger.debug(
                             f"类名匹配: 跳过工具窗口 '{title}' (class='{cls_name}')"
                         )
@@ -1099,23 +1123,31 @@ class EmulatorWindowFinder:
 
                     if any(pattern in cls_name for pattern in MUMU_CLASS_NAMES):
                         # 额外验证：检查窗口所属进程是否为 MuMu
-                        if HAS_WIN32PROCESS:
+                        if (
+                            win32process_module is not None
+                            and psutil_module is not None
+                        ):
                             try:
-                                _, pid = win32process.GetWindowThreadProcessId(hwnd)
-                                proc = psutil.Process(pid)
+                                _, pid = win32process_module.GetWindowThreadProcessId(
+                                    hwnd
+                                )
+                                proc = psutil_module.Process(pid)
                                 if proc.name() not in MUMU_PROCESS_NAMES:
                                     skipped_non_mumu += 1
                                     logger.debug(
-                                        f"类名匹配: 跳过非 MuMu 进程窗口 '{win32gui.GetWindowText(hwnd)}' (PID={pid}, 进程={proc.name()})"
+                                        f"类名匹配: 跳过非 MuMu 进程窗口 '{win32gui_module.GetWindowText(hwnd)}' (PID={pid}, 进程={proc.name()})"
                                     )
                                     return  # 不是 MuMu 进程，跳过
-                            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                            except (
+                                psutil_module.NoSuchProcess,
+                                psutil_module.AccessDenied,
+                            ):
                                 pass  # 无法获取进程名时，继续检查其他条件
                             except Exception:
                                 pass  # 其他错误，继续检查
 
-                        title = win32gui.GetWindowText(hwnd)
-                        rect = win32gui.GetWindowRect(hwnd)
+                        title = win32gui_module.GetWindowText(hwnd)
+                        rect = win32gui_module.GetWindowRect(hwnd)
                         # 过滤掉太小的窗口（可能是工具窗口）
                         w = rect[2] - rect[0]
                         h = rect[3] - rect[1]
@@ -1127,7 +1159,7 @@ class EmulatorWindowFinder:
             except Exception as e:
                 pass
 
-        win32gui.EnumWindows(callback, None)
+        win32gui_module.EnumWindows(callback, None)
 
         if skipped_non_mumu > 0:
             logger.debug(f"类名匹配: 跳过 {skipped_non_mumu} 个非 MuMu 进程窗口")
@@ -1150,6 +1182,11 @@ class EmulatorWindowFinder:
         results = []
         skipped_ide = 0  # 记录因 IDE 关键词而跳过的窗口数
 
+        if win32gui is None:
+            return results
+
+        win32gui_module = cast(Any, win32gui)
+
         logger.debug(f"标题匹配: 开始扫描窗口，目标模式: {self.WINDOW_PATTERNS}")
         logger.debug(f"标题匹配: 排除关键词: {EXCLUDE_TITLE_KEYWORDS}")
 
@@ -1167,7 +1204,7 @@ class EmulatorWindowFinder:
 
                     if pattern in title:
                         try:
-                            rect = win32gui.GetWindowRect(hwnd)
+                            rect = win32gui_module.GetWindowRect(hwnd)
                             w = rect[2] - rect[0]
                             h = rect[3] - rect[1]
                             # 过滤掉太小的窗口（可能是工具窗口）
@@ -1184,7 +1221,7 @@ class EmulatorWindowFinder:
         return results
 
     def find_window(
-        self, check_resolution: bool = True, emulator_type: str = None
+        self, check_resolution: bool = True, emulator_type: Optional[str] = None
     ) -> Tuple[int, str, Tuple[int, int, int, int], str]:
         """
         查找模拟器窗口（三重 fallback 机制）
@@ -1248,7 +1285,9 @@ class EmulatorWindowFinder:
             )
 
         # 处理找到的窗口（分辨率检查等）
-        result = self._process_candidates(candidates, check_resolution, match_method)
+        result = self._process_candidates(
+            candidates, check_resolution, match_method or "未知"
+        )
         if result:
             return result
 
@@ -1352,13 +1391,18 @@ class EmulatorWindowFinder:
         - 如果有多个窗口，只保留分辨率符合要求的
         - 如果只有一个窗口且分辨率不符合，报错退出
         """
+        if win32gui is None:
+            return None
+
+        win32gui_module = cast(Any, win32gui)
+
         # 第一步：收集所有匹配的模拟器窗口
         all_matched = []
         for pattern in patterns:
             for hwnd, title in windows:
                 if pattern in title:
                     try:
-                        rect = win32gui.GetWindowRect(hwnd)
+                        rect = win32gui_module.GetWindowRect(hwnd)
                         w = rect[2] - rect[0]
                         h = rect[3] - rect[1]
                         # 过滤掉太小的窗口（可能是工具窗口）
@@ -1450,10 +1494,15 @@ class EmulatorWindowFinder:
         """枚举所有可见窗口"""
         windows = []
 
+        if win32gui is None:
+            return windows
+
+        win32gui_module = cast(Any, win32gui)
+
         def callback(hwnd, extra):
             try:
-                if win32gui.IsWindowVisible(hwnd):
-                    title = win32gui.GetWindowText(hwnd)
+                if win32gui_module.IsWindowVisible(hwnd):
+                    title = win32gui_module.GetWindowText(hwnd)
                     if title:
                         windows.append((hwnd, title))
             except Exception as e:  # win32gui 可能抛出 pywintypes.error
@@ -1461,7 +1510,7 @@ class EmulatorWindowFinder:
                 pass
 
         try:
-            win32gui.EnumWindows(callback, None)
+            win32gui_module.EnumWindows(callback, None)
         except Exception as e:  # win32gui 可能抛出 pywintypes.error
             logger.error(f"枚举窗口时出错: {e}", exc_info=True)
 
@@ -1474,13 +1523,18 @@ class EmulatorWindowFinder:
 
     def _is_valid_window_with_reason(self, hwnd: int) -> tuple:
         """验证窗口是否有效，返回原因"""
-        if not win32gui.IsWindow(hwnd):
+        if win32gui is None:
+            return False, "win32gui 不可用"
+
+        win32gui_module = cast(Any, win32gui)
+
+        if not win32gui_module.IsWindow(hwnd):
             return False, "不是有效窗口"
-        if not win32gui.IsWindowVisible(hwnd):
+        if not win32gui_module.IsWindowVisible(hwnd):
             return False, "不可见"
 
         try:
-            rect = win32gui.GetWindowRect(hwnd)
+            rect = win32gui_module.GetWindowRect(hwnd)
             width = rect[2] - rect[0]
             height = rect[3] - rect[1]
 
@@ -1585,7 +1639,7 @@ class MuMuConfigManager:
         return None
 
     @classmethod
-    def save_port(cls, port: int, emulator_type: str = None):
+    def save_port(cls, port: int, emulator_type: Optional[str] = None):
         """保存端口到缓存"""
         try:
             config_file = cls._get_config_file()
@@ -1712,7 +1766,7 @@ class EmulatorManager:
         print(f"类型: {config.emulator_type}")
     """
 
-    def __init__(self, adb_path: str = None):
+    def __init__(self, adb_path: Optional[str] = None):
         """
         初始化模拟器管理器
 
@@ -1734,7 +1788,7 @@ class EmulatorManager:
         self.emulator_type: Optional[str] = None
 
     def initialize(
-        self, force_redetect: bool = False, emulator_type: str = None
+        self, force_redetect: bool = False, emulator_type: Optional[str] = None
     ) -> "MuMuConfig":
         """
         初始化模拟器（查找窗口和端口）
@@ -1837,7 +1891,9 @@ MuMuWindowFinder = EmulatorWindowFinder
 
 
 # ========== 便捷函数 ==========
-def init_emulator(adb_path: str = None, emulator_type: str = None) -> "MuMuConfig":
+def init_emulator(
+    adb_path: Optional[str] = None, emulator_type: Optional[str] = None
+) -> "MuMuConfig":
     """
     快速初始化模拟器（便捷函数）
 

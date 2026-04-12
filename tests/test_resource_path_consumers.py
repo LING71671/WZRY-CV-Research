@@ -46,11 +46,10 @@ def test_services_uses_resource_resolver_from_temp_cwd(tmp_path, monkeypatch):
 
     services._init_state_detection()
 
-    assert services.template_matcher.path_resolver is not None
-    assert (
-        Path(services.template_matcher.template_folder)
-        == tmp_path / "resolved_templates"
-    )
+    matcher = services.template_matcher
+    assert matcher is not None
+    assert matcher.path_resolver is not None
+    assert Path(matcher.template_folder) == tmp_path / "resolved_templates"
 
 
 def test_model1_astar_follow_uses_resource_resolver_from_temp_cwd(

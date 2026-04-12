@@ -55,13 +55,21 @@ class OptimizedAStarPathfinder:
 
         # 8方向移动
         self._dirs = [
-            (-1, 0, 1.0), (1, 0, 1.0), (0, -1, 1.0), (0, 1, 1.0),
-            (-1, -1, 1.414), (-1, 1, 1.414), (1, -1, 1.414), (1, 1, 1.414),
+            (-1, 0, 1.0),
+            (1, 0, 1.0),
+            (0, -1, 1.0),
+            (0, 1, 1.0),
+            (-1, -1, 1.414),
+            (-1, 1, 1.414),
+            (1, -1, 1.414),
+            (1, 1, 1.414),
         ]
 
     # ==================== 主入口 ====================
 
-    def find_path(self, start: Tuple[int, int], goal: Tuple[int, int]) -> Optional[List[Tuple[int, int]]]:
+    def find_path(
+        self, start: Tuple[int, int], goal: Tuple[int, int]
+    ) -> Optional[List[Tuple[int, int]]]:
         """
         寻路主入口。
 
@@ -73,7 +81,9 @@ class OptimizedAStarPathfinder:
             [(gx, gy), ...] 路点列表，或 None
         """
         # 边界检查
-        if not self._in_bounds(start[0], start[1]) or not self._in_bounds(goal[0], goal[1]):
+        if not self._in_bounds(start[0], start[1]) or not self._in_bounds(
+            goal[0], goal[1]
+        ):
             return None
 
         # 起点/终点在障碍内时 snap
@@ -139,11 +149,11 @@ class OptimizedAStarPathfinder:
             d, u = heappop(heap)
             if u == goal_node:
                 break
-            if d > dist.get(u, float('inf')):
+            if d > dist.get(u, float("inf")):
                 continue
             for v, cost in self.skeleton_adj.get(u, []):
                 nd = d + cost
-                if nd < dist.get(v, float('inf')):
+                if nd < dist.get(v, float("inf")):
                     dist[v] = nd
                     prev[v] = u
                     heappush(heap, (nd, v))
@@ -175,7 +185,7 @@ class OptimizedAStarPathfinder:
         if len(self._node_arr) == 0:
             return None
         diffs = self._node_arr - np.array([pos[0], pos[1]], dtype=np.float32)
-        dists = diffs[:, 0]**2 + diffs[:, 1]**2
+        dists = diffs[:, 0] ** 2 + diffs[:, 1] ** 2
         idx = int(np.argmin(dists))
         # 如果最近节点太远（>30格），不使用骨架路由
         if dists[idx] > 900:
@@ -196,7 +206,7 @@ class OptimizedAStarPathfinder:
         # parent: (x, y) -> (px, py)
         parent = {}
         # parent direction for turn penalty
-        parent_dir = {start: None}
+        parent_dir: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
 
         h = self._heuristic(start, goal)
         # heap: (f_score, x, y)
@@ -235,7 +245,9 @@ class OptimizedAStarPathfinder:
                 cl = float(self.clearance[ny, nx])
                 prox_penalty = 0.0
                 if cl < CLEARANCE_PENALTY_THRESHOLD:
-                    prox_penalty = (CLEARANCE_PENALTY_THRESHOLD - cl) * CLEARANCE_PENALTY_WEIGHT
+                    prox_penalty = (
+                        CLEARANCE_PENALTY_THRESHOLD - cl
+                    ) * CLEARANCE_PENALTY_WEIGHT
 
                 # 转向惩罚
                 new_dir = (ddx, ddy)
@@ -245,7 +257,7 @@ class OptimizedAStarPathfinder:
 
                 tentative_g = cur_g + move_cost + prox_penalty + turn_cost
 
-                if tentative_g < g_score.get(neighbor, float('inf')):
+                if tentative_g < g_score.get(neighbor, float("inf")):
                     g_score[neighbor] = tentative_g
                     parent[neighbor] = current
                     parent_dir[neighbor] = new_dir

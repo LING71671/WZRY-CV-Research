@@ -11,13 +11,19 @@
 import logging
 from math import sqrt
 
-from wzry_ai.config.base import CELL_SIZE, KEY_MOVE_UP, KEY_MOVE_DOWN, KEY_MOVE_LEFT, KEY_MOVE_RIGHT
+from wzry_ai.config.base import CELL_SIZE
+from wzry_ai.config.keys import (
+    KEY_MOVE_UP,
+    KEY_MOVE_DOWN,
+    KEY_MOVE_LEFT,
+    KEY_MOVE_RIGHT,
+)
 from wzry_ai.detection.map_preprocessor import MapLayers
 
 logger = logging.getLogger(__name__)
 
 # 英雄在小地图上的估计速度（像素/秒）
-_HERO_MINIMAP_SPEED = 80.0
+_HERO_MINIMAP_SPEED = 80.0 #存疑
 
 # 按键到方向向量的映射（小地图像素坐标系，Y 向下为正）
 _KEY_VELOCITY = {
@@ -50,7 +56,7 @@ class MapConstrainedLocalizer:
         self._active_path = None  # 当前活跃路径 [(gx, gy), ...]
 
     @classmethod
-    def get(cls) -> 'MapConstrainedLocalizer':
+    def get(cls) -> "MapConstrainedLocalizer":
         if cls._instance is None:
             cls._instance = cls()
         return cls._instance
@@ -103,15 +109,15 @@ class MapConstrainedLocalizer:
         pred = self._predict_position(dt)
 
         if pred and self.last_filtered_pos:
-            jump_dist = sqrt((obs_x - pred[0])**2 + (obs_y - pred[1])**2)
+            jump_dist = sqrt((obs_x - pred[0]) ** 2 + (obs_y - pred[1]) ** 2)
 
             # 根据跳跃距离决定混合权重
             if jump_dist < 8:
                 alpha = 0.85  # 观测和预测接近，信任观测
             elif jump_dist < 20:
-                alpha = 0.6   # 中等跳跃，混合
+                alpha = 0.6  # 中等跳跃，混合
             else:
-                alpha = 0.4   # 大跳跃，更信预测
+                alpha = 0.4  # 大跳跃，更信预测
 
             filtered_x = alpha * obs_x + (1 - alpha) * pred[0]
             filtered_y = alpha * obs_y + (1 - alpha) * pred[1]
@@ -133,9 +139,7 @@ class MapConstrainedLocalizer:
             filtered_y = snapped[1] * CELL_SIZE + CELL_SIZE / 2
 
         # 5. 置信度评分
-        self.confidence = self._compute_confidence(
-            obs_x, obs_y, filtered_x, filtered_y
-        )
+        self.confidence = self._compute_confidence(obs_x, obs_y, filtered_x, filtered_y)
 
         self.last_filtered_pos = (filtered_x, filtered_y)
         self.last_timestamp = timestamp
@@ -169,12 +173,12 @@ class MapConstrainedLocalizer:
 
         gx = x / CELL_SIZE
         gy = y / CELL_SIZE
-        best_dist = float('inf')
+        best_dist = float("inf")
         best_px, best_py = gx, gy
 
         # 只检查路径上附近的点（性能优化）
         for px, py in self._active_path:
-            d = (gx - px)**2 + (gy - py)**2
+            d = (gx - px) ** 2 + (gy - py) ** 2
             if d < best_dist:
                 best_dist = d
                 best_px, best_py = px, py
@@ -193,7 +197,7 @@ class MapConstrainedLocalizer:
         conf = 1.0
 
         # 观测与滤波结果的偏差
-        deviation = sqrt((obs_x - filt_x)**2 + (obs_y - filt_y)**2)
+        deviation = sqrt((obs_x - filt_x) ** 2 + (obs_y - filt_y) ** 2)
         if deviation > 15:
             conf *= 0.5
         elif deviation > 8:
@@ -213,4 +217,3 @@ class MapConstrainedLocalizer:
             conf *= max(0.3, 1.0 - self.frames_since_detection * 0.15)
 
         return max(0.1, conf)
-
