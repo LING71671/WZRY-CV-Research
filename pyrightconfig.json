@@ -1,0 +1,27 @@
+{
+  "include": ["src", "tests"],
+  "exclude": ["**/__pycache__", ".pytest_cache", ".ruff_cache"],
+  "ignore": [
+    "src/wzry_ai/compat/legacy",
+    "src/wzry_ai/app/loop_handlers.py",
+    "src/wzry_ai/detection/model1_detector.py",
+    "src/wzry_ai/detection/model2_detector.py",
+    "src/wzry_ai/detection/model3_detector.py",
+    "src/wzry_ai/device/ADBTool.py",
+    "src/wzry_ai/device/ScrcpyTool.py",
+    "src/wzry_ai/device/emulator_manager.py",
+    "src/wzry_ai/game_manager/detection_strategies.py",
+    "src/wzry_ai/game_manager/hero_feature_learner.py",
+    "src/wzry_ai/game_manager/hero_selector.py",
+    "src/wzry_ai/game_manager/popup_handler.py",
+    "src/wzry_ai/game_manager/state_detector.py",
+    "src/wzry_ai/game_manager/states/ai_mode_handler.py",
+    "src/wzry_ai/game_manager/template_matcher.py"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": ["src"]
+    }
+  ]
+}

@@ -19,8 +19,13 @@ from .skill_context import SkillContext
 
 # 从skill_types模块导入具体技能类型实现类
 from .skill_types import (
-    DamageSkill, ControlSkill, HealShieldSkill, 
-    BuffSkill, AttachSkill, ActiveItemSkill, SummonerSkill
+    DamageSkill,
+    ControlSkill,
+    HealShieldSkill,
+    BuffSkill,
+    AttachSkill,
+    ActiveItemSkill,
+    SummonerSkill,
 )
 # DamageSkill: 伤害技能类，对敌人造成伤害
 # ControlSkill: 控制技能类，眩晕、击飞、减速等效果
@@ -29,11 +34,6 @@ from .skill_types import (
 # AttachSkill: 位移/附身技能类，附身到队友身上
 # ActiveItemSkill: 辅助装备主动技能类，救赎之翼、奔狼纹章等
 # SummonerSkill: 召唤师技能类，治疗、闪现、眩晕等
-
-# 从 compat.legacy 导入已弃用的英雄技能管理器（仅用于向后兼容）
-# [弃用警告] HeroSkillManager 已迁移到 compat/legacy/，请使用 HeroSkillLogicBase 及各英雄的 *_skill_logic_v2.py
-from wzry_ai.compat.legacy.hero_skill_manager import HeroSkillManager
-# HeroSkillManager: 已弃用的技能管理器，保留仅用于过渡期兼容
 
 # 从hero_skill_logic_base模块导入英雄技能逻辑基类
 from .hero_skill_logic_base import HeroSkillLogicBase
@@ -49,29 +49,31 @@ from .caiwenji_skill_logic_v2 import CaiwenjiSkillLogic
 from .mingshiyin_skill_logic_v2 import MingshiyinSkillLogic
 # MingshiyinSkillLogic: 明世隐英雄技能逻辑实现
 
-from .generic_skill_manager import GenericSkillManager, SkillContext as GenericSkillContext
+from .generic_skill_manager import (
+    GenericSkillManager,
+    SkillContext as GenericSkillContext,
+)
 # GenericSkillManager: 通用技能管理器
 # GenericSkillContext: 通用技能上下文
 
 # __all__列表定义了当使用"from skills import *"时导出的符号
 __all__ = [
-    'SkillBase',           # 技能基类
-    'SkillType',           # 技能类型枚举
-    'TriggerCondition',    # 触发条件枚举
-    'CooldownType',        # 冷却类型枚举
-    'SkillContext',        # 技能上下文
-    'DamageSkill',         # 伤害技能
-    'ControlSkill',        # 控制技能
-    'HealShieldSkill',     # 治疗/护盾技能
-    'BuffSkill',           # 增益技能
-    'AttachSkill',         # 附身技能
-    'ActiveItemSkill',     # 装备主动技能
-    'SummonerSkill',       # 召唤师技能
-    'HeroSkillManager',    # 英雄技能管理器
-    'HeroSkillLogicBase',  # 英雄技能逻辑基类
-    'YaoSkillLogic',       # 瑶技能逻辑
-    'CaiwenjiSkillLogic',  # 蔡文姬技能逻辑
-    'MingshiyinSkillLogic', # 明世隐技能逻辑
-    'GenericSkillManager', # 通用技能管理器
-    'GenericSkillContext', # 通用技能上下文
+    "SkillBase",  # 技能基类
+    "SkillType",  # 技能类型枚举
+    "TriggerCondition",  # 触发条件枚举
+    "CooldownType",  # 冷却类型枚举
+    "SkillContext",  # 技能上下文
+    "DamageSkill",  # 伤害技能
+    "ControlSkill",  # 控制技能
+    "HealShieldSkill",  # 治疗/护盾技能
+    "BuffSkill",  # 增益技能
+    "AttachSkill",  # 附身技能
+    "ActiveItemSkill",  # 装备主动技能
+    "SummonerSkill",  # 召唤师技能
+    "HeroSkillLogicBase",  # 英雄技能逻辑基类
+    "YaoSkillLogic",  # 瑶技能逻辑
+    "CaiwenjiSkillLogic",  # 蔡文姬技能逻辑
+    "MingshiyinSkillLogic",  # 明世隐技能逻辑
+    "GenericSkillManager",  # 通用技能管理器
+    "GenericSkillContext",  # 通用技能上下文
 ]

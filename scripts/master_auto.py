@@ -1,19 +1,17 @@
 # pyright: reportMissingImports=false
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = REPO_ROOT / "src"
 
-for candidate in (SRC_ROOT, REPO_ROOT):
-    candidate_str = str(candidate)
-    if candidate_str not in sys.path:
-        sys.path.insert(0, candidate_str)
+src_root_str = str(SRC_ROOT)
+if src_root_str not in sys.path:
+    sys.path.insert(0, src_root_str)
 
-from wzry_ai.config import ADB_DEVICE_SERIAL
 from wzry_ai.app.main import main as _packaged_main
 
 
@@ -22,4 +20,6 @@ def main(adb_device=None):
 
 
 if __name__ == "__main__":
+    from wzry_ai.config import ADB_DEVICE_SERIAL
+
     main(adb_device=ADB_DEVICE_SERIAL)

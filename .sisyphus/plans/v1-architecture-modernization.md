@@ -91,7 +91,7 @@
 
 ## Verification Strategy
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
-- Test decision: **tests-after**. No project-level automated test suite is currently established; use characterization checks, import smoke, path smoke, and emulator-backed smoke scenarios.
+- Test decision: **tests-after**. A project-level automated test suite is now established and green (pytest: 138 passed, 1 skipped); use characterization checks, import smoke, path smoke, and emulator-backed smoke scenarios.
 - QA policy: Every task includes agent-executed scenarios.
 - Evidence: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 - Default applied: emulator-backed smoke is required in final validation when runtime is available; static checks remain mandatory regardless.

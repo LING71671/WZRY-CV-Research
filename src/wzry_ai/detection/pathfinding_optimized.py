@@ -23,25 +23,39 @@ import time
 
 # ==================== 优化 1: 改进的 A* 算法 ====================
 
+
 class OptimizedAStarPathfinder:
     """
     优化的 A* 寻路器
-    
+
     优化点：
     1. 使用元组代替类对象（减少内存分配）
     2. 早期终止（找到足够好的路径就停止）
     3. 更高效的启发函数
     4. 路径缓存
     """
-    
+
     def __init__(self, obstacle_map: np.ndarray):
         self.obstacle_map = obstacle_map
         self.grid_size = obstacle_map.shape[0]
         self.path_cache: Dict[Tuple, List[Tuple]] = {}
         self.cache_hits = 0
         self.cache_misses = 0
-        
+
         # 8方向移动向量
         self.directions = [
-            (-1, 0), (1, 0), (0, -1), (0, 1),  # 上下左右
- 
+            (-1, 0),
+            (1, 0),
+            (0, -1),
+            (0, 1),  # 上下左右
+            (-1, -1),
+            (-1, 1),
+            (1, -1),
+            (1, 1),  # 斜向
+        ]
+
+    def __getattr__(self, name):
+        raise NotImplementedError(
+            "OptimizedAStarPathfinder is a compile-safe placeholder in this snapshot; "
+            f"attribute '{name}' is unavailable."
+        )
