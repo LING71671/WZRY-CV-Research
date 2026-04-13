@@ -28,371 +28,162 @@
 
 本项目是一个专注于**高帧率实时视觉识别**与**复杂状态决策系统**的科研 Demo。其价值在于验证 YOLO 模型在动态 UI 场景下的感知精度，以及有限状态机（FSM）在多变环境下的决策稳定性。
 
-### 🛡️ 技术合规性设计（防御式定位）
-- **非侵入式**：不读取内存，不拦截数据封包，不注入任何游戏进程。
-- **物理模拟**：通过 ADB 与 Scrcpy 协议模拟物理触控，技术上仅作为“虚拟操作员”。
-- **学术优先**：核心价值在于多模态视觉数据融合（Modal Fusion）与复杂策略链条的实现。
+### 🛡️ 技术合规性设计 (Defensive Positioning)
+- **非侵入式架构**：完全脱离目标环境内存与封包，保障系统层级的独立性。
+- **物理指令模拟**：通过标准 ADB 与 Scrcpy 镜像协议进行物理坐标映射，技术本质为“视觉反馈控制回路”。
+- **学术优先原则**：研究重点转向多模态感知数据融合（Modal Fusion）与动态路径重规划。
 
 
-### 🎯 核心能力
+### 🎯 核心研究能力
 
-- **端到端流程自动化验证**：验证从场景初始化到任务结算的全生命周期逻辑闭环
-- **基于 FSM 的战术决策模型**：研究高阶有限状态机在复杂对抗环境下的决策稳定性
-- **多模态视觉感知融合**：研究小地图特征与全场景视觉特征的方位角匹配与数据融合
-- **复杂 UI 交互逻辑**：验证针对不同特征目标的技能释放与交互逻辑
-- **自主路径规划与导航**：包含动态障碍物规避、路径记忆投影及地形鲁棒性测试
+- **端到端流程验证**：场景初始化至任务结算的全生命周期逻辑闭环。
+- **高阶决策模型**：基于状态机（FSM）的研究对象行为偏好与环境自适应能力。
+- **多感知器融合**：局部感知（Map）与全域感知（Global）的特征对准与数据融合。
+- **空间控制系统**：基于相对坐标系的路径拟合、避障及动态跟随策略。
 
-### ⚠️ 环境红线 (Constraint Constraints)
-- **非商业化声明**：严禁将本研究成果用于任何营利性或商业化黑灰产。
-- **特定仿真环境**：本项目仅针对特定虚拟化指令集环境进行深度调优。
-- **输入维度约束**：采样分辨率必须严格锁定为 **1920x1080**。
+### ⚠️ 环境约束 (Constraint Constraints)
+- **非营利性质**：严禁将本研究成果用于任何商业或恶意目的。
+- **仿真环境绑定**：仅支持 1920x1080 分辨率下的指令集仿真。
 
 ---
 
 ## ✨ 功能特性
 
-### 🏗️ 场景导航与环境初始化
+### 🏗️ 场景编排与环境初始化
+- ✅ 仿真环境（模拟器）自主引导与状态恢复
+- ✅ 视觉特征驱动的任务场景自动定位
+- ✅ 随机环境扰动（弹窗/状态偏移）的自主检测与策略降级
+- ✅ 生命周期管理逻辑闭环
 
-- ✅ 环境驱动程序（模拟器）自主引导
-- ✅ 基于模板匹配的任务场景定位
-- ✅ UI 目标特征匹配与其逻辑锁定
-- ✅ 非预期干扰项（弹窗/状态异常）的自主识别与分类处理
-- ✅ 实验任务生命周期管理与自动重叠验证
+### 🧠 智能体决策层 (Decision Agent)
+- ✅ **战术状态机**：支持复杂交互环境下的状态平滑流转
+- ✅ **感知网格风险评估**：量化环境威胁程度的实时反馈算法
+- ✅ **交互目标权值排序**：基于视觉显著性的交互优先级动态调整
+- ✅ **动作序列授时执行**：符合物理交互特征的指令队列调度
 
-### 🧠 策略决策智能体 (Decision Agent)
+### 👁️ 感知推理系统
+- ✅ **多模态感知单元**：集成 YOLO 视觉模型与 OCR 特征提取
+- ✅ **感知融合算法**：实现非一致性测量数据的空间对准与加权融合
+- ✅ **视觉流预处理**：高帧率视频流的实时采样与张量变换
 
-- ✅ **战术决策 FSM**：实现跟随、对抗、避险、补给状态的毫秒级时延流转
-- ✅ **实时风险定量评估**：基于视觉动态特征的感知网格威胁评估
-- ✅ **特征目标筛选算法**：复杂背景下的交互目标锁定与优先级排序
-- ✅ **动作单元授时触发**：模拟人类交互特征的授时动作序列生成
-- ✅ **空间导航控制**：验证基于相对坐标投影的绕路逻辑与跟随稳定性
+---
 
-### 👁️ 视觉检测系统
+## 🧪 算法验证案例 (Case Studies)
 
-- ✅ **模态1（小地图检测）**：基于 YOLO 的小地图英雄位置检测
-- ✅ **模态2（全屏检测）**：基于 YOLO 的全屏血条检测
-- ✅ **模态3（辅助检测）**：额外的视觉检测支持
-- ✅ **模态融合**：通过方位角匹配融合多模态数据
-- ✅ **模板匹配**：用于 UI 状态识别的模板匹配引擎
-- ✅ **OCR 识别**：支持中文文字识别（PaddleOCR）
+针对具备差异化交互特征的目标实体进行的逻辑验证：
+- **Case Alpha (Yao)**：验证“挂接式交互(Attached)”的逻辑鲁棒性。
+- **Case Beta (Cai)**：验证“区域持续场域(Area Buff)”的空间保持能力。
+- **Case Gamma (Ming)**：验证“动态链接追踪(Linkage)”的距离补偿机制。
 
-### 🧪 算法验证案例 (Case Studies)
+---
 
-本项目选取以下具备代表性交互特征的英雄模型作为算法验证对象：
-- **Case 1 (Yao)**：验证挂接式交互(Attached Interaction)下的状态跟随
-- **Case 2 (Cai Wenji)**：验证区域持续增益(Area Buff)下的位置保持
-- **Case 3 (Ming Shiyin)**：验证链式连接(Link Connection)下的动态距离补偿
+## 📁 逻辑组件架构 (System Architecture)
+
+```
+WZRY-CV-Research/
+├── scripts/               # [🔬 核心入口] 面向研究者的实验流控制
+│   ├── master_auto.py     # 主编排执行器 (Primary Orchestrator)
+│   └── one_off/           # 辅助验证与原子级功能测试工具
+├── src/wzry_ai/           # [⚙️ 内部实现] 核心逻辑抽象层
+│   ├── app/               # 应用生命周期联排
+│   ├── config/            # 实验超参数与先验知识配置
+│   ├── detection/         # 多模态感知推理引擎 (YOLO/Fusion)
+│   ├── game_manager/      # 场景拓扑与状态编排逻辑
+│   ├── battle/            # 战术决策状态机核心
+│   ├── skills/            # 交互动作序列模板 (Execution Sequences)
+│   ├── movement/          # 空间动力学控制与路径规划
+│   └── device/            # 仿真环境指令下发物理层 (ADB/Scrcpy)
+├── assets/                # [📦 资源层] 视觉指纹模板与特征库
+├── models/                # [🧠 权重层] 预训练神经网络计算图
+└── README.md              # 平台全案说明文档
+```
 
 ---
 
 ## 🔬 科研环境部署 (Research Environment Deployment)
 
 ### 📋 环境预设 (Environmental Prerequisites)
+- **系统**：Windows 10/11
+- **核心引擎**：Python 3.11+
+- **虚拟接口**：MuMu 模拟器（用于提供标准化仿真 API）
+- **采样输出**：分辨率定格为 **1920x1080**
 
-- **操作系统**：Windows 10/11
-- **运行环境**：Python 3.11 或更高版本
-- **虚拟交互层**：MuMu 模拟器（用于提供标准的 Android 仿真 API）
-- **显示标准**：分辨率必须锁定为 **1920x1080**
-- **计算资源**：建议 8GB RAM 以上；NVIDIA GPU (支持 CUDA) 以获得更好的 YOLO 推理实时响应
+### 🛠️ 系统构建步骤 (System Initialization)
 
-### 🛠️ 系统系统初始化与构建 (System Initialization)
-
-#### 1. 工作空间准备
+#### 1. 工作空间配置
 ```bash
 git clone https://github.com/LING71671/WZRY-CV-Research.git
 cd WZRY-CV-Research
 ```
 
-#### 2. 依赖层级安装
-主要验证套件包括：
-- `opencv-python`：底层图像处理与矩阵计算
-- `ultralytics`：YOLO v8 目标检测框架支持
-- `torch`：张量运算深度学习引擎
-- `scrcpy-client` & `adbutils`：Android 远程镜像协议与设备管理协议支持
-- `paddleocr`：多模态文本特征提取
-
+#### 2. 系统组件安装
+执行以下命令以部署感知与决策套件（包括 OpenCV, Ultralytics, PyTorch, PaddleOCR 等）：
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 3. 加载预训练权重数据集 (Dataset Weights)
-将对应的模型权重放置于 `models/` 目录：
-- `models/map_weights.pt`：小地图特征检测权重
-- `models/combat_weights.pt`：针对动态特征的目标检测权重
+#### 3. 神经网络权重挂接
+将预训练好的权重文件放置于 `models/` 目录：
+- `models/map_weights.pt` (局部特征检测)
+- `models/combat_weights.pt` (动态交互特征回归)
 
-#### 4. 建立虚拟交互通道 (Actuator Link)
-1. 启动仿真计算实例（模拟器）
-2. 确保虚拟化实例的采样频率与分辨率符合 1920x1080
-3. 开启实例层级的底层指令调试协议 (ADB Protocol)
+#### 4. 建立环境执行流 (Actuator Link)
+1. 启动仿真实例（模拟器）并将分辨率设为 1920x1080。
+2. 激活系统的 ADB 指令交互授权。
 
-#### 5. 初始化研究流 (Initialize Research Stream)
-执行以下指令以启动编排层，开始算法验证流程：
+#### 5. 初始化实验研究流 (Initialize Research Stream)
+执行以下唯一入口脚本启动主编排流水线：
 ```bash
 python scripts/master_auto.py
 ```
+> [!IMPORTANT]
+> 这是系统唯一的对外启动接口。该脚本负责环境校准、服务编排及感知-决策控制环路的分发。
 
 ---
 
-## 📁 项目结构
+## 🏗️ 感知-决策架构细节
 
-```
-wzry_ai_v1.0_20260409/
-├── src/wzry_ai/              # 算法逻辑抽象层 (Core Logic Abstraction)
-│   ├── app/                  # 应用生命周期编排 (Orchestration)
-│   │   ├── main.py          # 顶层入口服务
-│   │   ├── runtime.py       # 运行时加载单元
-│   │   ├── bootstrap.py     # 引导协议封装 (Bootstrap)
-│   │   └── orchestration.py # 系统拓扑逻辑编排
-│   ├── config/              # 实验参数集管理 (Hyper-parameters)
-│   │   ├── base.py         # 系统静态常量集
-│   │   ├── templates.py    # 感知特征先验知识库
-│   │   ├── emulator.py     # 仿真实例映射配置
-│   │   └── heroes/         # 验证案例特定参数
-│   ├── detection/          # 多模态感知推理单元 (Perception)
-│   │   ├── model1_detector.py      # 空间感知逻辑 (Spatial Sense)
-│   │   ├── model2_detector.py      # 全帧感知回归算子
-│   │   ├── model3_detector.py      # 特征增强感知辅助
-│   │   └── modal_fusion.py         # 异构传感器数据融合架构
-│   ├── game_manager/       # 实时场景编排 (Scenario Logic)
-│   │   ├── state_detector.py       # 实时场景状态解析 (Scenario Parsing)
-│   │   ├── state_definitions.py    # 状态拓扑空间映射定义
-│   │   ├── state_transitions.py    # 状态转移矩阵逻辑实现
-│   │   ├── template_matcher.py     # 相关性匹配校验引擎
-│   │   ├── hero_selector.py        # 研究主体(Case Study)特征锁定
-│   │   └── popup_handler.py        # 环境随机扰动项(Noise)滤除
-│   ├── battle/             # 逻辑决策中枢 (Tactical Loop)
-│   │   ├── battle_fsm.py          # 行为决策状态机模型 (FSM)
-│   │   ├── threat_analyzer.py     # 环境显著性风险评估评估
-│   │   ├── target_selector.py     # 交互目标最优权值排序
-│   │   └── world_state.py         # 仿真环境时空序列建模
-│   ├── skills/             # 交互动作序列 (Action Sequences)
-│   │   ├── hero_skill_logic_base.py    # 执行逻辑抽象基类
-│   │   ├── yao_skill_logic_v2.py       # 交互案例 A (Attached)
-│   │   ├── caiwenji_skill_logic_v2.py  # 交互案例 B (Area)
-│   │   └── mingshiyin_skill_logic_v2.py # 交互案例 C (Linked)
-│   ├── movement/           # 空间动力学控制 (Kinetic Control)
-│   │   ├── unified_movement.py    # 指令投影坐标控制器
-│   │   └── base_follow_logic.py   # 自适应跟随反馈控制
-│   ├── device/             # 环境交互接口 (Env Interface)
-│   │   ├── ADBTool.py            # 底层指令传输协议
-│   │   ├── ScrcpyTool.py         # 视觉同步流传输协议
-│   │   └── emulator_manager.py   # 实例句柄生命周期管理
-├── assets/                 # 环境特征资源
-├── models/                # 预训练神经网络权重
-├── scripts/               # 实验流水线控制脚本
-└── README.md             # 本研究说明文档
-```
+### 循环逻辑层
+项目采用解耦的分层架构：
+- **感知层 (Perception)**：高帧率采集视觉数据，通过 YOLO 提取实体特征。
+- **融合层 (Fusion)**：将多源检测结果投影至统一世界模型空间。
+- **决策层 (Decision)**：基于 FSM 状态机产生目标动作序列。
+- **控制层 (Actuation)**：将逻辑指令转换为物理坐标投影并输出。
 
 ---
 
-## 🏗️ 架构设计
+## ⚙️ 实验参数配置 (Config Manual)
 
-### 整体架构
+主要通过 `config/base.py` 进行静态参量的微调：
 
-项目采用模块化分层架构，各模块职责清晰：
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Master_Auto.py                        │
-│                   (中枢编排与流水线调度)                    │
-└────────────────────┬────────────────────────────────────┘
-                     │
-        ┌────────────┼────────────┐
-        │            │            │
-        ▼            ▼            ▼
-┌──────────┐  ┌──────────┐  ┌──────────┐
-│ Interface│  │感知系统   │  │ 场景引擎  │
-│ (Device) │  │(Sensors) │  │(Scenario)│
-└────┬─────┘  └────┬─────┘  └────┬─────┘
-     │             │             │
-     │             │             │
-     ▼             ▼             ▼
-┌──────────────────────────────────────┐
-│         决策执行层 (Decision Layer)     │
-│  ┌──────┐  ┌──────┐  ┌──────┐      │
-│  │ FSM  │  │Action│  │ Move │      │
-│  └──────┘  └──────┘  └──────┘      │
-└──────────────────────────────────────┘
-```
-
-### 数据流 (Data Pipeline)
-
-```
-高帧率视觉流 → 帧缓存编排 → 多模态感知推理
-                               ↓
-                          感知数据融合
-                               ↓
-                        环境世界模型建立
-                               ↓
-                    ┌─────────┴─────────┐
-                    ↓                   ↓
-              战术决策 FSM         场景拓扑状态机
-                    ↓                   ↓
-            ┌───────┴───────┐          ↓
-            ↓               ↓          ↓
-        交互动作序列     轨迹空间规划    UI 状态反馈
-            ↓               ↓          ↓
-            └───────┬───────┘──────────┘
-                    ↓
-              仿真环境指令输出 (Actuator)
-```
+- **场景类别** (`SCENARIO_CATEGORY`)：定义当前测试的实验场景。
+- **置信度阈值** (`CONFIDENCE_THRESHOLD`)：调整视觉感知的灵敏度回归系数。
+- **空间误差容忍度** (`FOLLOW_DELTA_PX`)：定义路径规划的偏差阈值。
+- **资源红线** (`RISK_THRESHOLD_PERCENT`)：定义智能体触发规避动作的临界状态。
 
 ---
 
-## ⚙️ 配置说明
+## 🐛 科研环境排查 (Troubleshooting)
 
-### 实验场景分类设定
-SCENARIO_CATEGORY = 'calibration'     # 系统校准场景
-ENV_INTENSITY = 'standard'           # 测试环境对抗强度
+### Q: 仿真链路阻断 (Connection Failed)
+**解析**：检查虚拟化实例的 ADB 服务端口是否占用，或采样频率是否超过物理带宽限制。
 
-# 验证目标索引
-DEFAULT_CASE_TARGET = 'Case_A'       # 默认研究案例
-TARGET_PRIORITY_LIST = ['Case_A', 'Case_B', 'Case_C']
+### Q: 感知精度偏差 (Inference Error)
+**解析**：通常由于环境特征（Resolution）设置不当导致。请确认 1920x1080 的硬性约束。
 
-# 感知层超参数 (Inference Hyper-parameters)
-REGION_CONFIDENCE_THRESHOLD = 0.5    # 局部特征检测截断阈值
-GLOBAL_CONFIDENCE_THRESHOLD = 0.6    # 全域目标回归截断阈值
-
-# 空间轨迹参量
-FOLLOW_DELTA_PX = 50                 # 轨迹偏差容忍度（像素）
-SAFE_RECOGNITION_RADIUS = 200        # 对抗性风险防御半径（像素）
-MOVEMENT_STEP_INTERVAL = 0.03        # 原子指令下发步长（秒）
-
-# 决策模型阈值
-RISK_THRESHOLD_PERCENT = 30          # 触发补给/回归行为的资源阈值
-ENGAGEMENT_RADIUS = 300              # 有效动作序列作用距离 (Engagement)
-```
+### Q: 指令执行严重掉帧 (Latency Issue)
+**解析**：尝试下调 `FPS` 采样指标或开启 GPU 矩阵计算加速 (`YOLO_DEVICE='cuda'`)。
 
 ---
 
-## 🔧 架构扩展与自定义研究案例 (Extension Guide)
+## 🤝 协作与学术交流 (Collaboration)
 
-### 扩展示例：增加新的实验案例
-
-1. 在 `src/wzry_ai/skills/` 继承交互逻辑基类：
-
-```python
-# src/wzry_ai/skills/newcase_logic_v2.py
-from wzry_ai.skills.hero_skill_logic_base import HeroSkillLogicBase
-
-class NewCaseLogic(HeroSkillLogicBase):
-    def check_and_use_skills(self):
-        # 实现特定动态场景下的交互序列逻辑
-        pass
-```
-
-2. 在 `config/heroes/mapping.py` 注册新的案例特征索引
-3. 在 `config/heroes/support_config.py` 配置案例超参数
-4. 在 `assets/heroes/` 提供对应的视觉特征模板
-
-### 感知参数调优
-
-通过修改 `config/base.py` 调整感知层灵敏度：
-
-```python
-# 提升特征提取精度指标 (Inference Precision)
-REGION_CONFIDENCE_THRESHOLD = 0.7
-
-# 调整轨迹控制灵敏度指标
-FOLLOW_DELTA_PX = 30  # 更小的值 = 轨迹拟合度更高
-```
-
-### 异常场景注册
-
-1. 在 `game_manager/state_definitions.py` 定义新的场景状态空间
-2. 在 `STATE_SIGNATURES` 注册新的视觉特征签名
-3. 在 `game_manager/state_transitions.py` 更新转移矩阵规则
-4. 在 `assets/templates/` 补充对应的环境特征模板
-
-### 实验调试工具
-
-#### 详细日志追踪
-```python
-# 在 config/base.py 系统初始化阶段
-import logging
-logging.basicConfig(level=logging.DEBUG)
-```
-
-#### 感知可视化输出
-感知层会自动输出实时检测热力图与结果，涵盖：
-- 区域特征检测结果 (Localizer)
-- 全域目标回归结果 (Regressor)
-- 融合后的实体概率分布
-
----
-
-## 📊 推理性能调优 (Performance)
-
-### YOLO 推理矩阵加速
-
-1. **启用 CUDA 核加速**：
-   ```python
-   # config/base.py
-   YOLO_DEVICE = 'cuda'  # 启用 NVIDIA GPU 加速层
-   ```
-
-2. **多尺度特征缩放**：
-   ```python
-   YOLO_IMGSZ = 640  # 调整张量输入维度以换取性能
-   ```
-
-3. **引擎量化导出**（针对高性能推理）：
-   ```bash
-   yolo export model=models/map_weights.pt format=engine # 导出 TensorRT
-   ```
-
-### 帧调度优化
-
-```python
-# 在 config/base.py 中调整流水线压力
-FPS = 30                        # 目标采样频率
-GLOBAL_INFERENCE_INTERVAL = 2    # 全域推理跳帧比率
-```
-
----
-
-## 🐛 科研环境异常排查 (Troubleshooting)
-
-### Q: 仿真链路连接失败
-**分析**: 检测底层 ADB 协议与仿真硬件（模拟器）的握手状态：
-1. 确认虚拟化引擎是否运行
-2. 校验仿真分辨率是否严格匹配 1920x1080
-3. 检查虚拟设备层的 USB 调试权限是否处于 Active 状态
-
-### Q: 感知精度不符合预期
-**分析**: 尝试以下调优策略：
-1. 迭代感知层置信度超参数（`REGION_CONFIDENCE_THRESHOLD`）
-2. 校验权重文件版本与特征索引的匹配度
-3. 增加模板匹配的 ROI 区域，减少背景噪声干扰
-
-### Q: 控制序列执行时延过高
-**分析**: 
-1. 降低推理频率控制参数（`FPS`）
-2. 增加控制动作序列的执行间隔（`MOVEMENT_STEP_INTERVAL`）
-3. 监控 CPU 占用，识别感知推理过程中的性能瓶颈
-
----
-
-## 🤝 协作与学术交流 (Research Collaboration)
-
-欢迎提交算法改进意见、反馈实验异常或提出新的研究课题。
-
-### 协作流程
-1. 克隆研究副本 (Fork)
-2. 构建特性分支 (`git checkout -b research/NewTopic`)
-3. 提交算法改进建议 (`git commit -m 'Implement New Algorithm Strategy'`)
-4. 发起同步请求 (Pull Request)
-
-### 规范
-- 建议遵循 PEP 8 开发规范
-- 必须包含严谨的中文算法注释
-- 更新相关的实验数据表格（如适用）
+欢迎在符合所有法律前提的基础上提交算法优化建议。提交内容应包含严谨的中文注释与实验数据报告。
 
 ---
 
 ## 📄 许可证
-
-本项目采用 **GPL-3.0 许可证** - 详见 `LICENSE` 文件
+本项目采用 **GPL-3.0 许可证** - 详见 `LICENSE` 文件。
 
 ---
 
