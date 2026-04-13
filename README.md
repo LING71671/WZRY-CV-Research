@@ -11,7 +11,7 @@
 </div>
 
 > [!CAUTION]
-> # 🛰️ 法律免责声明与风险预警 (LEGAL DISCLAIMER & RISK WARNING)
+> # 🛰️ 异构感知系统法律免责声明与风险预警 (LEGAL DISCLAIMER)
 > 
 > **本程序仅作为【计算机视觉（CV）】与【人机交互（HCI）】领域的纯学术研究 Demo。作者在此明确声明：从未授权任何人将本项目代码与任何受版权保护、包含用户协议限制的游戏客户端（包括但不限于腾讯旗下的《王者荣耀》）联调运行。**
 > 
@@ -42,10 +42,10 @@
 - **复杂 UI 交互逻辑**：验证针对不同特征目标的技能释放与交互逻辑
 - **自主路径规划与导航**：包含动态障碍物规避、路径记忆投影及地形鲁棒性测试
 
-### ⚠️ 运行红线
-- **严禁商业化**：严禁通过本项目或衍生版本进行任何营利行为。
-- **模拟器专用**：本项目针对 Windows 系统下的模拟器环境进行深度优化。
-- **环境要求**：模拟器分辨率必须严格设定为 **1920x1080**，否则识别系统将失效。
+### ⚠️ 环境红线 (Constraint Constraints)
+- **非商业化声明**：严禁将本研究成果用于任何营利性或商业化黑灰产。
+- **特定仿真环境**：本项目仅针对特定虚拟化指令集环境进行深度调优。
+- **输入维度约束**：采样分辨率必须严格锁定为 **1920x1080**。
 
 ---
 
@@ -120,10 +120,10 @@ pip install -r requirements.txt
 - `models/map_weights.pt`：小地图特征检测权重
 - `models/combat_weights.pt`：针对动态特征的目标检测权重
 
-#### 4. 建立虚拟交互通道
-1. 启动仿真环境（模拟器）
-2. 确保虚拟设备的分辨率与采样率符合 1920x1080
-3. 开启设备层级的 USB 调试授权（ADB 协议通道）
+#### 4. 建立虚拟交互通道 (Actuator Link)
+1. 启动仿真计算实例（模拟器）
+2. 确保虚拟化实例的采样频率与分辨率符合 1920x1080
+3. 开启实例层级的底层指令调试协议 (ADB Protocol)
 
 #### 5. 初始化研究流 (Initialize Research Stream)
 执行以下指令以启动编排层，开始算法验证流程：
@@ -137,42 +137,42 @@ python scripts/master_auto.py
 
 ```
 wzry_ai_v1.0_20260409/
-├── src/wzry_ai/              # 核心代码包 (Core Lib)
-│   ├── app/                  # 应用生命周期管理 (Lifecycle Management)
-│   │   ├── main.py          # 顶层服务引导
-│   │   ├── runtime.py       # 运行时自洽环境加载
-│   │   ├── bootstrap.py     # 引导协议
-│   │   └── orchestration.py # 服务拓扑编排
-│   ├── config/              # 实验超参数管理 (Experimental Config)
-│   │   ├── base.py         # 核心静态超参数
-│   │   ├── templates.py    # 视觉特征索引特征库
-│   │   ├── emulator.py     # 仿真环境实例配置
+├── src/wzry_ai/              # 算法逻辑抽象层 (Core Logic Abstraction)
+│   ├── app/                  # 应用生命周期编排 (Orchestration)
+│   │   ├── main.py          # 顶层入口服务
+│   │   ├── runtime.py       # 运行时加载单元
+│   │   ├── bootstrap.py     # 引导协议封装 (Bootstrap)
+│   │   └── orchestration.py # 系统拓扑逻辑编排
+│   ├── config/              # 实验参数集管理 (Hyper-parameters)
+│   │   ├── base.py         # 系统静态常量集
+│   │   ├── templates.py    # 感知特征先验知识库
+│   │   ├── emulator.py     # 仿真实例映射配置
 │   │   └── heroes/         # 验证案例特定参数
-│   ├── detection/          # 多模态感知层 (Perception)
-│   │   ├── model1_detector.py      # 区域特征提取器 (Map-based)
-│   │   ├── model2_detector.py      # 全域目标提取器 (Global-frame)
-│   │   ├── model3_detector.py      # 辅助视觉增强算子
-│   │   └── modal_fusion.py         # 异构感知数据融合逻辑
-│   ├── game_manager/       # 场景上下文编排 (Scenario Orchestration)
-│   │   ├── state_detector.py       # 场景状态提取算子
-│   │   ├── state_definitions.py    # 状态空间映射定义
-│   │   ├── state_transitions.py    # 状态转移矩阵规则
-│   │   ├── template_matcher.py     # 视觉特征匹配引擎
-│   │   ├── hero_selector.py        # 目标特征锁定逻辑
-│   │   └── popup_handler.py        # 环境随机干扰项处理 (Interrupts)
-│   ├── battle/             # 战术决策模块 (Tactical Decisions)
-│   │   ├── battle_fsm.py          # 决策状态机实现 (FSM)
-│   │   ├── threat_analyzer.py     # 动态风险感知评估
-│   │   ├── target_selector.py     # 优先级目标选取算法
-│   │   └── world_state.py         # 对抗场景时空建模
+│   ├── detection/          # 多模态感知推理单元 (Perception)
+│   │   ├── model1_detector.py      # 空间感知逻辑 (Spatial Sense)
+│   │   ├── model2_detector.py      # 全帧感知回归算子
+│   │   ├── model3_detector.py      # 特征增强感知辅助
+│   │   └── modal_fusion.py         # 异构传感器数据融合架构
+│   ├── game_manager/       # 实时场景编排 (Scenario Logic)
+│   │   ├── state_detector.py       # 实时场景状态解析 (Scenario Parsing)
+│   │   ├── state_definitions.py    # 状态拓扑空间映射定义
+│   │   ├── state_transitions.py    # 状态转移矩阵逻辑实现
+│   │   ├── template_matcher.py     # 相关性匹配校验引擎
+│   │   ├── hero_selector.py        # 研究主体(Case Study)特征锁定
+│   │   └── popup_handler.py        # 环境随机扰动项(Noise)滤除
+│   ├── battle/             # 逻辑决策中枢 (Tactical Loop)
+│   │   ├── battle_fsm.py          # 行为决策状态机模型 (FSM)
+│   │   ├── threat_analyzer.py     # 环境显著性风险评估评估
+│   │   ├── target_selector.py     # 交互目标最优权值排序
+│   │   └── world_state.py         # 仿真环境时空序列建模
 │   ├── skills/             # 交互动作序列 (Action Sequences)
 │   │   ├── hero_skill_logic_base.py    # 执行逻辑抽象基类
 │   │   ├── yao_skill_logic_v2.py       # 交互案例 A (Attached)
 │   │   ├── caiwenji_skill_logic_v2.py  # 交互案例 B (Area)
 │   │   └── mingshiyin_skill_logic_v2.py # 交互案例 C (Linked)
-│   ├── movement/           # 空间轨迹控制 (Spatial Control)
-│   │   ├── unified_movement.py    # 仿真坐标系投影控制器
-│   │   └── base_follow_logic.py   # 目标追踪反馈算法
+│   ├── movement/           # 空间动力学控制 (Kinetic Control)
+│   │   ├── unified_movement.py    # 指令投影坐标控制器
+│   │   └── base_follow_logic.py   # 自适应跟随反馈控制
 │   ├── device/             # 环境交互接口 (Env Interface)
 │   │   ├── ADBTool.py            # 底层指令传输协议
 │   │   ├── ScrcpyTool.py         # 视觉同步流传输协议
@@ -241,29 +241,26 @@ wzry_ai_v1.0_20260409/
 
 ## ⚙️ 配置说明
 
-### 实验参数预设 (config/base.py)
-
-```python
-# 验证场景分类
-SCENARIO_CATEGORY = 'calibration'     # 测试场景类别
-ENV_INTENSITY = 'standard'           # 对抗环境强度设定
+### 实验场景分类设定
+SCENARIO_CATEGORY = 'calibration'     # 系统校准场景
+ENV_INTENSITY = 'standard'           # 测试环境对抗强度
 
 # 验证目标索引
-DEFAULT_CASE_TARGET = 'Yao'          # 默认算法验证案例 (Case A)
-TARGET_PRIORITY_LIST = ['Yao', 'CaiWenji', 'MingShiyin']
+DEFAULT_CASE_TARGET = 'Case_A'       # 默认研究案例
+TARGET_PRIORITY_LIST = ['Case_A', 'Case_B', 'Case_C']
 
-# 感知层阈值 (Inference Hyper-parameters)
-REGION_CONFIDENCE_THRESHOLD = 0.5    # 区域特征检测置信度上限
-GLOBAL_CONFIDENCE_THRESHOLD = 0.6    # 全域目标检测置信度上限
+# 感知层超参数 (Inference Hyper-parameters)
+REGION_CONFIDENCE_THRESHOLD = 0.5    # 局部特征检测截断阈值
+GLOBAL_CONFIDENCE_THRESHOLD = 0.6    # 全域目标回归截断阈值
 
-# 空间轨迹参数
-FOLLOW_DELTA_PX = 50                 # 目标追踪偏差容忍度（像素）
-SAFE_RECOGNITION_RADIUS = 200        # 对抗性风险规避半径（像素）
-MOVEMENT_STEP_INTERVAL = 0.03        # 物理控制采样步长（秒）
+# 空间轨迹参量
+FOLLOW_DELTA_PX = 50                 # 轨迹偏差容忍度（像素）
+SAFE_RECOGNITION_RADIUS = 200        # 对抗性风险防御半径（像素）
+MOVEMENT_STEP_INTERVAL = 0.03        # 原子指令下发步长（秒）
 
 # 决策模型阈值
-RETREAT_STATE_HP_PERCENT = 30        # 风险规避触发血量阈值
-COMBAT_ENGAGEMENT_RADIUS = 300       # 有效动作序列覆盖半径
+RISK_THRESHOLD_PERCENT = 30          # 触发补给/回归行为的资源阈值
+ENGAGEMENT_RADIUS = 300              # 有效动作序列作用距离 (Engagement)
 ```
 
 ---
