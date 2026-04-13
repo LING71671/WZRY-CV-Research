@@ -3,12 +3,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+.pytest_cache/
+.ruff_cache/
 
 # sisyphus 工作目录
 .sisyphus/
 
 # 虚拟环境
 venv/
+venv*/
 env/
 ENV/
 
@@ -36,9 +39,14 @@ models/*.onnx
 *.bak
 .DS_Store
 Thumbs.db
+test_zip/
 
-# Ruff 缓存
-.ruff_cache/
+# 压缩包和第三方工具
+*.zip
+scrcpy/
+
+# 脚本工具 (仅本地使用)
+scripts/one_off/
 
 # 测试覆盖率
 .coverage

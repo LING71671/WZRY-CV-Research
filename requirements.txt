@@ -19,14 +19,14 @@ ultralytics
 torch
 
 # ========== 设备连接与控制 ==========
-# scrcpy-client - 安卓屏幕镜像和视频流
-scrcpy-client
+# scrcpy-client - 安卓屏幕镜像和视频流 - 暂不安装，av依赖有兼容性问题
+# scrcpy-client
 
 # adbutils - ADB设备管理
 adbutils
 
-# av - PyAV视频处理（scrcpy依赖）
-av
+# av - PyAV视频处理（scrcpy依赖）- 暂不安装，需要从源码编译
+# av
 
 # pywin32 - Windows API访问（win32gui, win32con等）
 pywin32

@@ -48,9 +48,16 @@ EMULATOR_MODELS = {
 # 用于通过窗口标题识别和定位模拟器窗口
 WINDOW_PATTERNS = {
     "mumu": [  # MuMu模拟器可能的窗口标题（按优先级排序）
-        "MuMu安卓设备",  # 最精确的匹配，MuMu 12+ 版本
-        "MuMu模拟器",  # 较精确的匹配
-        "MuMuPlayer",  # 旧版本或国际版
+        "王者荣耀-Android Device",  # MuMu 12 运行游戏时的标题
+        "王者荣耀",                 # 游戏启动后的标题
+        "Android Device",           # MuMu 12 默认实例标题
+        "MuMu安卓设备",             # MuMu 12 内部标题
+        "MuMu模拟器",               # 常见匹配
+        "MuMu模擬器",               # 繁体匹配
+        "MuMuPlayer",               # 旧版本或国际版
+        "MuMu Player 12",           # MuMu 12 特定版本
+        "MuMuNxDevice",             # 内部进程关联标题
+        "MuMu",                     # 通用匹配
     ],
 }
 
@@ -73,11 +80,12 @@ EXCLUDE_TITLE_KEYWORDS = [
 # MUMU_PROCESS_NAMES列表定义了MuMu模拟器的主进程名称
 # 用于通过进程名查找模拟器窗口（不依赖窗口标题）
 MUMU_PROCESS_NAMES = [
-    "MuMuNxDevice.exe",  # MuMu 12+ 主窗口进程（最常用）
-    "MuMuPlayer.exe",  # 旧版本主进程
+    "MuMuNxMain.exe",    # MuMu 12+ 主程序进程
+    "MuMuNxDevice.exe",  # MuMu 12+ 设备窗口进程
+    "MuMuPlayer.exe",    # 旧版本主进程
     "MuMuVMMHeadless.exe",  # VMM 虚拟机进程
-    "MuMuVMMSVC.exe",  # VMM 服务进程
-    "NemuPlayer.exe",  # 旧版 Nemu 进程
+    "MuMuVMMSVC.exe",    # VMM 服务进程
+    "NemuPlayer.exe",    # 旧版 Nemu 进程
 ]
 
 # ========== 模拟器窗口类名配置 ==========

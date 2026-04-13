@@ -105,16 +105,13 @@ from compat.legacy import old_module  # 直接导入legacy
 
 ### 主入口
 ```bash
-# 推荐：使用规范脚本入口
+# 规范脚本入口点
 python scripts/master_auto.py
-
-# 兼容：根目录入口（仅作委托）
-python Master_Auto.py
 ```
 
 ### 启动流程
 ```
-Master_Auto.py
+scripts/master_auto.py
   ↓
 wzry_ai.app.main.main()
   ↓
@@ -157,7 +154,7 @@ python -c "import wzry_ai; import wzry_ai.app; import wzry_ai.config"
 python -m compileall src
 
 # 3. 启动测试
-python Master_Auto.py  # 应该能启动到模拟器检测
+python scripts/master_auto.py  # 应该能启动到模拟器检测
 
 # 4. 依赖扫描
 # 确保没有导入 compat/legacy（除非是批准的shim）

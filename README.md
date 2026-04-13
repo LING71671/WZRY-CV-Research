@@ -1,23 +1,38 @@
-# 王者荣耀 AI 自动化项目
+# 🌌 WZRY AI: 基于计算机视觉的人机交互算法研究平台
 
 <div align="center">
 
-**基于计算机视觉和深度学习的王者荣耀自动化游戏 AI**
+**[ 警告：本项目仅为算法研究演示，作者从未授权将其用于任何商业游戏环境 ]**
 
+[![License](https://img.shields.io/badge/License-GPL--3.0-brightgreen.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.8+-green.svg)](https://opencv.org/)
-[![YOLO](https://img.shields.io/badge/YOLO-v8-red.svg)](https://github.com/ultralytics/ultralytics)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-
-[功能特性](#功能特性) • [快速开始](#快速开始) • [架构设计](#架构设计) • [配置说明](#配置说明) • [开发指南](#开发指南)
+[![Control](https://img.shields.io/badge/Hardware-ADB%20/%20Scrcpy-orange.svg)]()
 
 </div>
 
+> [!CAUTION]
+> # 🛰️ 法律免责声明与风险预警 (LEGAL DISCLAIMER & RISK WARNING)
+> 
+> **本程序仅作为【计算机视觉（CV）】与【人机交互（HCI）】领域的纯学术研究 Demo。作者在此明确声明：从未授权任何人将本项目代码与任何受版权保护、包含用户协议限制的游戏客户端（包括但不限于腾讯旗下的《王者荣耀》）联调运行。**
+> 
+> 1. **零授权声明**：本项目不分发任何游戏资产，亦不提供任何运行授权。代码的本质是一套**基于图像特征进行逻辑决策的数学演示流程**。任何将其部署到实际游戏环境的行为，均属**未经作者许可的滥用行为**。
+> 2. **违约责任预警**：由于《腾讯游戏许可及服务协议》严禁使用任何第三方自动化工具，使用者若执意自行运行本项目，即构成了**针对腾讯公司的单方面违约**。由此产生的封号、诉讼、虚拟财产损失等后果，由使用者**独立、排他地承担全部法律责任**。
+> 3. **物理模拟本质**：本项目仅通过 ADB 和 Scrcpy 协议进行物理级模拟操作。它不篡改内存、不截获封包、不破坏计算机信息系统安全。即便如此，其在技术上的“非侵入性”并不能豁免使用者违反第三方平台协议的责任。
+> 4. **零容忍政策**：本项目作者强烈反对并谴责一切破坏游戏公平性的行为。项目初衷仅为探索 AI 在复杂 UI 环境下的感知能力，严禁用于任何破坏网络空间秩序的非法用途。
+> 
+> **一旦你下载、克隆或以任何方式运行本项目代码，即表示你已阅读并完全同意上述所有声明。使用者因违规运行产生的一切纠纷，项目作者概不负责。**
+
 ---
 
-## 📖 项目简介
+## 🔬 项目定位
 
-这是一个基于计算机视觉和深度学习技术的王者荣耀自动化 AI 项目，能够自动完成从启动游戏、选择英雄、到战斗操作的完整流程。项目采用模块化架构设计，支持多英雄、多模式，具有高度的可扩展性。
+本项目是一个专注于**高帧率实时视觉识别**与**复杂状态决策系统**的科研 Demo。其价值在于验证 YOLO 模型在动态 UI 场景下的感知精度，以及有限状态机（FSM）在多变环境下的决策稳定性。
+
+### 🛡️ 技术合规性设计（防御式定位）
+- **非侵入式**：不读取内存，不拦截数据封包，不注入任何游戏进程。
+- **物理模拟**：通过 ADB 与 Scrcpy 协议模拟物理触控，技术上仅作为“虚拟操作员”。
+- **学术优先**：核心价值在于多模态视觉数据融合（Modal Fusion）与复杂策略链条的实现。
+
 
 ### 🎯 核心能力
 
@@ -27,11 +42,10 @@
 - **英雄技能系统**：支持多个辅助英雄的技能释放逻辑
 - **智能移动控制**：包含卡地形检测、自动绕路、路径记忆等功能
 
-### ⚠️ 重要说明
-
-- **仅限学习研究**：本项目仅供学习计算机视觉和游戏 AI 技术使用
-- **Windows + MuMu 模拟器**：项目专为 Windows 系统和 MuMu 模拟器优化
-- **分辨率要求**：模拟器分辨率必须设置为 1920x1080
+### ⚠️ 运行红线
+- **严禁商业化**：严禁通过本项目或衍生版本进行任何营利行为。
+- **模拟器专用**：本项目针对 Windows 系统下的模拟器环境进行深度优化。
+- **环境要求**：模拟器分辨率必须严格设定为 **1920x1080**，否则识别系统将失效。
 
 ---
 
@@ -124,12 +138,7 @@ pip install -r requirements.txt
 #### 5. 运行项目
 
 ```bash
-python Master_Auto.py
-```
-
-或使用规范入口点：
-
-```bash
+# 推荐使用规范脚本入口点
 python scripts/master_auto.py
 ```
 
@@ -194,7 +203,8 @@ wzry_ai_v1.0_20260409/
 ├── data/                  # 运行时数据
 ├── docs/                  # 文档
 ├── scripts/               # 脚本
-├── Master_Auto.py         # 主入口（兼容性）
+│   ├── master_auto.py     # 规范主入口
+│   └── one_off/           # 一次性工具脚本 (本地忽略)
 ├── requirements.txt       # 依赖列表
 └── README.md             # 本文件
 ```
@@ -513,32 +523,16 @@ M2_DETECT_INTERVAL = 2  # 增加检测间隔
 
 ---
 
+---
+
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
-
----
-
-## 🙏 致谢
-
-- [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) - 目标检测框架
-- [scrcpy](https://github.com/Genymobile/scrcpy) - 安卓屏幕镜像
-- [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) - 中文 OCR 识别
-- [OpenCV](https://opencv.org/) - 计算机视觉库
-
----
-
-## 📞 联系方式
-
-- 项目主页：[GitHub Repository](https://github.com/your-repo/wzry_ai)
-- 问题反馈：[Issues](https://github.com/your-repo/wzry_ai/issues)
+本项目采用 **GPL-3.0 许可证** - 详见 `LICENSE` 文件
 
 ---
 
 <div align="center">
 
-**⭐ 如果这个项目对你有帮助，请给个 Star！⭐**
-
-Made with ❤️ by the WZRY AI Team
+**[ END OF DOCUMENT ]**
 
 </div>

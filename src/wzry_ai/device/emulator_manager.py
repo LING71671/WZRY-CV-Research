@@ -828,6 +828,9 @@ except ImportError:
     # Fallback: 使用默认配置
     WINDOW_PATTERNS = {
         "mumu": [
+            "Android Device",
+            "王者荣耀-Android Device",
+            "王者荣耀",
             "MuMu安卓设备",
             "MuMu模拟器",
             "MuMuPlayer",
@@ -839,6 +842,7 @@ except ImportError:
     BORDER_WIDTH = 16
     TITLE_HEIGHT = 48
     MUMU_PROCESS_NAMES = [
+        "MuMuNxMain.exe",
         "MuMuNxDevice.exe",
         "MuMuPlayer.exe",
         "MuMuVMMHeadless.exe",
